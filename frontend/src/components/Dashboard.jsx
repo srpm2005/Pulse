@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { apiFetch } from '../services/api';
 import Layout from './Layout';
 import StockWidget from './StockWidget';
 import AlertsTable from './AlertsTable';
@@ -32,22 +33,37 @@ export default function DashboardContainer({ onLogout }) {
     });
 
     useEffect(() => {
-
-        const saved = JSON.parse(localStorage.getItem('pulse_tracked_stocks')) || [];
-        setTrackedStocks(saved);
+        const fetchTracked = async () => {
+            try {
+                const data = await apiFetch('/api/stocks/tracked');
+                setTrackedStocks(data);
+            } catch (e) {
+                console.error(e);
+            }
+        };
+        fetchTracked();
     }, []);
 
-    const handleAddStock = (instrumentKey, symbol, companyName) => {
-        if (trackedStocks.find(s => s.instrumentKey === instrumentKey)) return;
-        const updated = [...trackedStocks, { instrumentKey, symbol, companyName }];
-        setTrackedStocks(updated);
-        localStorage.setItem('pulse_tracked_stocks', JSON.stringify(updated));
+    const handleAddStock = async (instrumentKey, symbol, companyName) => {
+        if (trackedStocks.find(s => s.instrumentKey === instrumentKey || s.symbol === symbol)) return;
+        try {
+            const newStock = await apiFetch('/api/stocks/tracked', {
+                method: 'POST',
+                body: JSON.stringify({ symbol, companyName })
+            });
+            setTrackedStocks([...trackedStocks, newStock]);
+        } catch (e) {
+            console.error(e);
+        }
     };
 
-    const removeStock = (symbol) => {
-        const updated = trackedStocks.filter(s => s.symbol !== symbol);
-        setTrackedStocks(updated);
-        localStorage.setItem('pulse_tracked_stocks', JSON.stringify(updated));
+    const removeStock = async (symbol) => {
+        try {
+            await apiFetch(`/api/stocks/tracked/${symbol}`, { method: 'DELETE' });
+            setTrackedStocks(trackedStocks.filter(s => s.symbol !== symbol));
+        } catch (e) {
+            console.error(e);
+        }
     };
 
     const handleOpenAlertFromCard = (symbol, companyName) => {
