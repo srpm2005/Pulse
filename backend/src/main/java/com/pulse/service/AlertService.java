@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -21,7 +22,7 @@ public class AlertService {
 
     private final PriceAlertRepository alertRepository;
     private final UserRepository userRepository;
-    private final AlphaVantageService alphaVantageService;
+    private final YahooFinanceService yahooFinanceService;
     private final EmailService emailService;
 
     public PriceAlert createAlert(AlertRequest request, String email) {
@@ -54,13 +55,14 @@ public class AlertService {
         });
     }
 
+    @Transactional
     public void checkAndTriggerAlerts() {
         log.info("Checking triggered alerts...");
         List<PriceAlert> activeAlerts = alertRepository.findByTriggeredFalse();
         
         for (PriceAlert alert : activeAlerts) {
             try {
-                StockQuoteDto quote = alphaVantageService.getQuote(alert.getSymbol());
+                StockQuoteDto quote = yahooFinanceService.getQuote(alert.getSymbol());
                 if (quote != null) {
                     boolean isTriggered = false;
                     double currentPrice = quote.getLastPrice();

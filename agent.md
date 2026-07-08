@@ -179,12 +179,12 @@ alert.scheduler.cron=0 * * * * *
 
 ---
 
-### Stock Data (Alpha Vantage)
+### Stock Data (Yahoo Finance Scraper)
 
-**`AlphaVantageService.java`**
-- Uses `RestTemplate` or `WebClient`
-- `getQuote(String symbol)` → calls `GET /query?function=GLOBAL_QUOTE&symbol={key}&apikey={token}`
-- `searchSymbol(String query)` → calls `GET /query?function=SYMBOL_SEARCH&keywords={query}&apikey={token}`
+**`YahooFinanceService.java`**
+- Uses customized `RestTemplate` with `User-Agent` HTTP header injection to bypass scraping blocks.
+- `getQuote(String symbol)` → calls `GET https://query1.finance.yahoo.com/v8/finance/chart/{symbol}`
+- `searchSymbol(String query)` → calls `GET https://query2.finance.yahoo.com/v1/finance/search?q={query}`
 - Returns `StockQuoteDto { symbol, companyName, lastPrice, change, changePercent, high, low, volume }`
 
 **`StockController.java`** — endpoints:
@@ -216,12 +216,16 @@ alert.scheduler.cron=0 * * * * *
 
 ---
 
-### Email Notifications (Resend)
+### Alerts & Notifications
+
+**`AlertService.java`** & **`AlertScheduler.java`**
+- Uses `@Scheduled(cron = "...")` to poll dynamic stocks.
+- Iterates over active `PriceAlert` database items, scrapes latest quote via `YahooFinanceService`, tests the `AlertCondition` threshold.
 
 **`EmailService.java`**
-- Uses `RestTemplate` to call Resend REST API: `POST https://api.resend.com/emails`
-- Sets `Authorization: Bearer <resend-api-key>` header
-- Sends JSON body: `{ "from": "...", "to": ["user@email.com"], "subject": "...", "html": "..." }`
+- Implements `org.springframework.mail.javamail.JavaMailSender` injected by Spring Boot Starter Mail.
+- Compiles rich HTML alert payloads using `MimeMessageHelper`.
+- Delivers completely free outbound emails to any third-party inbox directly from `@gmail.com` SMTP using Google App Passwords!
 - Method: `sendPriceAlertEmail(String toEmail, String symbol, String companyName, double targetPrice, double currentPrice, String condition)`
 - HTML email body: clean, minimal template indicating stock name, current price, and triggered condition
 

@@ -1,38 +1,36 @@
 package com.pulse.service;
 
-import com.resend.Resend;
-import com.resend.services.emails.model.CreateEmailOptions;
-import com.resend.services.emails.model.CreateEmailResponse;
+import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
 public class EmailService {
 
-    @Value("${resend.api.key}")
-    private String resendApiKey;
+    private final JavaMailSender javaMailSender;
 
-    @Value("${resend.from-email}")
+    @Value("${spring.mail.username}")
     private String fromEmail;
 
     public void sendPriceAlertEmail(String toEmail, String symbol, String companyName, double targetPrice, double currentPrice, String condition) {
         try {
-            Resend resend = new Resend(resendApiKey);
+            MimeMessage message = javaMailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
             String subject = "Pulse Alert: " + symbol + " has reached your target!";
             String html = buildEmailHtml(symbol, companyName, targetPrice, currentPrice, condition);
 
-            CreateEmailOptions sendEmailRequest = CreateEmailOptions.builder()
-                    .from(fromEmail)
-                    .to(toEmail)
-                    .subject(subject)
-                    .html(html)
-                    .build();
+            helper.setFrom(fromEmail);
+            helper.setTo(toEmail);
+            helper.setSubject(subject);
+            helper.setText(html, true);
 
-            CreateEmailResponse data = resend.emails().send(sendEmailRequest);
-            System.out.println("Email sent successfully: " + data.getId());
+            javaMailSender.send(message);
+            System.out.println("Email sent successfully via Gmail SMTP to: " + toEmail);
         } catch (Exception e) {
             e.printStackTrace();
         }
