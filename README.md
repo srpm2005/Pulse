@@ -2,6 +2,9 @@
 
 Pulse is a modern, full-stack real-time stock tracking dashboard featuring an elegant dark glassmorphism UI, secure JWT authentication, and automated email price alerts.
 
+
+<img width="1917" height="1021" alt="image" src="https://github.com/user-attachments/assets/9315708d-c368-4e7e-b0fc-89cb26351f0f" />
+
 ## 🚀 Features
 
 - **Global Stock Tracking:** Live market data scraping natively hooked into Yahoo Finance. Supports US Equities, Indian NSE/BSE stocks, ETFs, and more.
