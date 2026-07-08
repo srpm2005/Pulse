@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pulse.dto.StockQuoteDto;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -16,25 +17,28 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class YahooFinanceService {
 
+    private static final HttpEntity<String> HEADERS;
+    static {
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36");
+        HEADERS = new HttpEntity<>(headers);
+    }
+
     private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper;
 
-    private HttpEntity<String> getHeaders() {
-        HttpHeaders headers = new HttpHeaders();
-        // Yahoo Finance requires a User-Agent to prevent basic scraping blocks
-        headers.set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36");
-        return new HttpEntity<>(headers);
-    }
+
 
     public StockQuoteDto getQuote(String symbol) {
         try {
             String url = "https://query1.finance.yahoo.com/v8/finance/chart/" + symbol;
             
-            ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, getHeaders(), String.class);
+            ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, HEADERS, String.class);
             if (!response.getStatusCode().is2xxSuccessful() || response.getBody() == null) {
                 return null;
             }
@@ -76,21 +80,20 @@ public class YahooFinanceService {
                     .build();
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("Failed to fetch quote for {}: {}", symbol, e.getMessage());
             return null;
         }
     }
 
     public Map<String, Object> getChartData(String symbol, String range) {
         try {
-            // e.g. range = 1d, 5d, 1mo, 6mo, 1y
             String interval = "1d";
             if ("1d".equals(range)) interval = "5m";
             else if ("5d".equals(range)) interval = "15m";
             
             String url = "https://query1.finance.yahoo.com/v8/finance/chart/" + symbol + "?range=" + range + "&interval=" + interval;
             
-            ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, getHeaders(), String.class);
+            ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, HEADERS, String.class);
             if (!response.getStatusCode().is2xxSuccessful() || response.getBody() == null) {
                 return null;
             }
@@ -123,7 +126,7 @@ public class YahooFinanceService {
             return chartData;
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("Failed to fetch chart for {}: {}", symbol, e.getMessage());
             return null;
         }
     }
@@ -132,7 +135,7 @@ public class YahooFinanceService {
         try {
             String url = "https://query2.finance.yahoo.com/v1/finance/search?q=" + query + "&quotesCount=10";
             
-            ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, getHeaders(), String.class);
+            ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, HEADERS, String.class);
             if (!response.getStatusCode().is2xxSuccessful() || response.getBody() == null) {
                 return List.of();
             }
@@ -143,7 +146,6 @@ public class YahooFinanceService {
             List<Map<String, String>> results = new ArrayList<>();
             if (quotes.isArray()) {
                 for (JsonNode item : quotes) {
-                    // Filter down to equities primarily
                     String type = item.path("quoteType").asText();
                     if ("EQUITY".equalsIgnoreCase(type) || "ETF".equalsIgnoreCase(type)) {
                         results.add(Map.of(
@@ -157,7 +159,7 @@ public class YahooFinanceService {
             return results;
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("Failed to search symbol {}: {}", query, e.getMessage());
             return List.of();
         }
     }
