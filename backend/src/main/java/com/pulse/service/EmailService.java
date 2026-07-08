@@ -38,33 +38,32 @@ public class EmailService {
 
     private String buildEmailHtml(String symbol, String companyName, double targetPrice, double currentPrice, String condition) {
         String trendColor = currentPrice >= targetPrice ? "#10b981" : "#ef4444";
-        String statusText = currentPrice >= targetPrice ? "Target Reached \uD83D\uDFE2" : "Dropped Below \uD83D\uDD34";
+        String statusText = currentPrice >= targetPrice ? "CONDITION MET" : "CONDITION MET"; // Alert triggered
 
-        return "<div style=\"margin:0;padding:20px;background-color:#0b0f19;font-family:'Helvetica Neue', Helvetica, Arial, sans-serif;color:#f8fafc;\">" +
-                "  <div style=\"max-width:600px;margin:0 auto;background:#131b2c;border:1px solid #1e293b;border-radius:12px;overflow:hidden;box-shadow:0 10px 25px rgba(0,0,0,0.5);\">" +
-                "    <div style=\"background: linear-gradient(90deg, #6366f1 0%, #a855f7 100%);padding:25px;text-align:center;\">" +
-                "      <h1 style=\"margin:0;color:#ffffff;font-size:24px;letter-spacing:1px;font-weight:700;\">PULSE MARKET ALERT</h1>" +
+        return "<div style=\"margin:0;padding:40px 20px;background-color:#000000;font-family:-apple-system, BlinkMacSystemFont, 'Inter', sans-serif;color:#ffffff;\">" +
+                "  <div style=\"max-width:500px;margin:0 auto;background:#0a0a0a;border:1px solid #222222;border-radius:4px;overflow:hidden;\">" +
+                "    <div style=\"padding:16px 20px;border-bottom:1px solid #222222;display:flex;justify-content:space-between;align-items:center;\">" +
+                "      <span style=\"margin:0;color:#888888;font-size:11px;font-weight:600;letter-spacing:0.5px;text-transform:uppercase;\">PULSE // SYSTEM ALERT</span>" +
                 "    </div>" +
-                "    <div style=\"padding:35px 30px;\">" +
-                "      <h2 style=\"margin:0 0 10px 0;font-size:22px;color:#e2e8f0;\">" + (companyName != null ? companyName : symbol) + "</h2>" +
-                "      <p style=\"margin:0 0 25px 0;color:#94a3b8;font-size:15px;letter-spacing:1px;\">Ticker: <strong>" + symbol + "</strong></p>" +
-                "      <div style=\"background:#0f1523;border-radius:8px;padding:20px;border-left:4px solid " + trendColor + ";margin-bottom:30px;\">" +
-                "        <h3 style=\"margin:0 0 15px 0;font-size:18px;color:#cbd5e1;\">" + statusText + "</h3>" +
-                "        <table style=\"width:100%;border-collapse:collapse;\">" +
+                "    <div style=\"padding:24px 20px;\">" +
+                "      <div style=\"margin-bottom:24px;\">" +
+                "        <h2 style=\"margin:0 0 4px 0;font-size:16px;font-weight:600;color:#ffffff;\">" + symbol + "</h2>" +
+                "        <span style=\"color:#555555;font-size:11px;\">" + (companyName != null ? companyName : symbol) + "</span>" +
+                "      </div>" +
+                "      <div style=\"background:#000000;border:1px solid #222222;border-radius:4px;padding:16px;margin-bottom:24px;\">" +
+                "        <div style=\"font-size:10px;color:" + trendColor + ";font-weight:600;text-transform:uppercase;margin-bottom:12px;letter-spacing:0.5px;\">STATUS: " + statusText + "</div>" +
+                "        <table style=\"width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums;\">" +
                 "          <tr>" +
-                "            <td style=\"padding:8px 0;color:#64748b;font-size:14px;\">Current Price</td>" +
-                "            <td style=\"padding:8px 0;text-align:right;color:" + trendColor + ";font-size:18px;font-weight:bold;\">$" + String.format("%.2f", currentPrice) + "</td>" +
+                "            <td style=\"padding:8px 0;color:#888888;font-size:12px;border-bottom:1px solid #222222;\">Current Price</td>" +
+                "            <td style=\"padding:8px 0;text-align:right;color:#ffffff;font-size:14px;font-weight:600;border-bottom:1px solid #222222;\">$" + String.format("%.2f", currentPrice) + "</td>" +
                 "          </tr>" +
                 "          <tr>" +
-                "            <td style=\"padding:8px 0;border-top:1px solid #1e293b;color:#64748b;font-size:14px;\">Target Goal (" + condition + ")</td>" +
-                "            <td style=\"padding:8px 0;border-top:1px solid #1e293b;text-align:right;color:#e2e8f0;font-size:16px;font-weight:600;\">$" + String.format("%.2f", targetPrice) + "</td>" +
+                "            <td style=\"padding:8px 0;color:#888888;font-size:12px;\">Target (" + condition + ")</td>" +
+                "            <td style=\"padding:8px 0;text-align:right;color:#888888;font-size:12px;font-weight:500;\">$" + String.format("%.2f", targetPrice) + "</td>" +
                 "          </tr>" +
                 "        </table>" +
                 "      </div>" +
-                "      <a href=\"http://localhost:3000\" style=\"display:block;width:100%;text-align:center;background:#6366f1;color:#ffffff;text-decoration:none;padding:14px 0;border-radius:6px;font-weight:600;font-size:15px;letter-spacing:0.5px;transition:background 0.3s ease;\">View Your Dashboard</a>" +
-                "    </div>" +
-                "    <div style=\"background:#0d121f;padding:20px;text-align:center;border-top:1px solid #1e293b;\">" +
-                "      <p style=\"margin:0;color:#475569;font-size:12px;\">&copy; 2026 Pulse Analytics. Crafted with precision.</p>" +
+                "      <a href=\"http://localhost:5173\" style=\"display:block;width:100%;text-align:center;background:#ffffff;color:#000000;text-decoration:none;padding:10px 0;border-radius:4px;font-weight:600;font-size:12px;transition:background 0.2s;\">View Dashboard (Local)</a>" +
                 "    </div>" +
                 "  </div>" +
                 "</div>";

@@ -49,6 +49,7 @@ public class YahooFinanceService {
             JsonNode meta = resultNode.get(0).path("meta");
             
             double lastPrice = meta.path("regularMarketPrice").asDouble(0.0);
+            String currency = meta.path("currency").asText("USD");
             double previousClose = meta.path("previousClose").asDouble(0.0);
             double high = meta.path("regularMarketDayHigh").asDouble(0.0);
             double low = meta.path("regularMarketDayLow").asDouble(0.0);
@@ -65,6 +66,7 @@ public class YahooFinanceService {
                     .instrumentKey(symbol)
                     .symbol(symbol)
                     .companyName(symbol) 
+                    .currency(currency)
                     .lastPrice(lastPrice)
                     .change(change)
                     .changePercent(changePercent)
