@@ -11,10 +11,15 @@ export default function StockWidget({ symbol, companyName, onRemove, onSetAlert 
 
     const fetchData = async () => {
         try {
-            const data = await apiFetch(`/api/stocks/quote?symbol=${encodeURIComponent(symbol)}`);
+            const symArg = encodeURIComponent(symbol);
+
+            const [data, chartData] = await Promise.all([
+                apiFetch(`/api/stocks/quote?symbol=${symArg}`),
+                apiFetch(`/api/stocks/chart?symbol=${symArg}`)
+            ]);
+
             setQuote(data);
 
-            const chartData = await apiFetch(`/api/stocks/chart?symbol=${encodeURIComponent(symbol)}`);
             if (chartData?.prices?.length > 0) {
                 renderChart(chartData);
             }
