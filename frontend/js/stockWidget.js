@@ -149,6 +149,9 @@ const renderCardSkeleton = (instrumentKey) => {
             <div>High: --</div>
             <div>Low: --</div>
         </div>
+        <div class="chart-container" style="height: 100px; margin-top: 15px;">
+            <canvas id="chart-${instrumentKey}"></canvas>
+        </div>
     `;
 
     grid.appendChild(d);
@@ -176,14 +179,62 @@ const fetchAndRenderQuote = async (instrumentKey) => {
         const stats = card.querySelectorAll('.stats-row div');
         stats[0].textContent = `High: ${quote.high.toFixed(2)}`;
         stats[1].textContent = `Low: ${quote.low.toFixed(2)}`;
+
+        // Load historical chart data
+        const chartData = await apiFetch(`/api/stocks/chart?symbol=${encodeURIComponent(instrumentKey)}`);
+        if (chartData && chartData.prices && chartData.prices.length > 0) {
+            renderChart(instrumentKey, chartData);
+        }
     } catch (e) {
         console.error('Failed to fetch quote for', instrumentKey);
     }
+};
+
+const charts = {};
+
+const renderChart = (instrumentKey, data) => {
+    const ctx = document.getElementById(`chart-${instrumentKey}`);
+    if (!ctx) return;
+
+    if (charts[instrumentKey]) {
+        charts[instrumentKey].data.labels = data.timestamps;
+        charts[instrumentKey].data.datasets[0].data = data.prices;
+        charts[instrumentKey].update();
+        return;
+    }
+
+    const isUp = data.prices[data.prices.length - 1] >= data.prices[0];
+    const color = isUp ? '#10b981' : '#ef4444';
+
+    charts[instrumentKey] = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: data.timestamps,
+            datasets: [{
+                data: data.prices,
+                borderColor: color,
+                borderWidth: 2,
+                pointRadius: 0,
+                tension: 0.1,
+                fill: false
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false }, tooltip: { enabled: false } },
+            scales: {
+                x: { display: false },
+                y: { display: false, min: Math.min(...data.prices) * 0.995, max: Math.max(...data.prices) * 1.005 }
+            },
+            layout: { padding: 0 }
+        }
+    });
 };
 
 const startAutoRefresh = () => {
     if (refreshInterval) clearInterval(refreshInterval);
     refreshInterval = setInterval(() => {
         trackedStocks.forEach(stock => fetchAndRenderQuote(stock.instrumentKey));
-    }, 30000);
+    }, 15000); // 15 seconds real-time fast poll
 };

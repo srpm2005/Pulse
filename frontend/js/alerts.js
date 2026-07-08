@@ -29,17 +29,24 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Make load alerts globally available
-    window.loadAlerts = async () => {
-        showLoader();
+    window.loadAlerts = async (silent = false) => {
+        if (!silent) showLoader();
         try {
             const alerts = await apiFetch('/api/alerts');
             renderAlerts(alerts);
         } catch (error) {
             // Already handled
         } finally {
-            hideLoader();
+            if (!silent) hideLoader();
         }
     };
+
+    // Real-time polling
+    setInterval(() => {
+        if (document.getElementById('alerts-view').classList.contains('active')) {
+            window.loadAlerts(true);
+        }
+    }, 5000); // poll silently every 5 seconds
 });
 
 const renderAlerts = (alerts) => {

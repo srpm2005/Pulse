@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -71,6 +72,53 @@ public class YahooFinanceService {
                     .low(low)
                     .volume(volume)
                     .build();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public Map<String, Object> getChartData(String symbol, String range) {
+        try {
+            // e.g. range = 1d, 5d, 1mo, 6mo, 1y
+            String interval = "1d";
+            if ("1d".equals(range)) interval = "5m";
+            else if ("5d".equals(range)) interval = "15m";
+            
+            String url = "https://query1.finance.yahoo.com/v8/finance/chart/" + symbol + "?range=" + range + "&interval=" + interval;
+            
+            ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, getHeaders(), String.class);
+            if (!response.getStatusCode().is2xxSuccessful() || response.getBody() == null) {
+                return null;
+            }
+
+            JsonNode root = objectMapper.readTree(response.getBody());
+            JsonNode resultNode = root.path("chart").path("result").get(0);
+            
+            if (resultNode == null || resultNode.isMissingNode()) {
+                return null;
+            }
+
+            JsonNode timestamps = resultNode.path("timestamp");
+            JsonNode closePrices = resultNode.path("indicators").path("quote").get(0).path("close");
+
+            List<Long> timeList = new ArrayList<>();
+            List<Double> priceList = new ArrayList<>();
+
+            if (timestamps.isArray() && closePrices.isArray()) {
+                for (int i = 0; i < timestamps.size(); i++) {
+                    if (!closePrices.get(i).isNull()) {
+                        timeList.add(timestamps.get(i).asLong());
+                        priceList.add(closePrices.get(i).asDouble());
+                    }
+                }
+            }
+
+            Map<String, Object> chartData = new HashMap<>();
+            chartData.put("timestamps", timeList);
+            chartData.put("prices", priceList);
+            return chartData;
 
         } catch (Exception e) {
             e.printStackTrace();

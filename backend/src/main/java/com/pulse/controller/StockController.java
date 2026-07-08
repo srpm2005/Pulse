@@ -30,4 +30,14 @@ public class StockController {
         List<Map<String, String>> results = yahooFinanceService.searchSymbol(query);
         return ResponseEntity.ok(results);
     }
+
+    @GetMapping("/chart")
+    public ResponseEntity<Map<String, Object>> getChart(@RequestParam("symbol") String symbol,
+                                                        @RequestParam(value = "range", defaultValue = "1mo") String range) {
+        Map<String, Object> data = yahooFinanceService.getChartData(symbol, range);
+        if (data == null || data.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(data);
+    }
 }
