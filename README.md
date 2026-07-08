@@ -3,7 +3,7 @@
 Pulse is a modern, full-stack real-time stock tracking dashboard featuring an elegant dark glassmorphism UI, secure JWT authentication, and automated email price alerts.
 
 
-<img width="1917" height="1021" alt="image" src="https://github.com/user-attachments/assets/9315708d-c368-4e7e-b0fc-89cb26351f0f" />
+<img width="1917" height="1022" alt="image" src="https://github.com/user-attachments/assets/21a43282-4eaf-4ce3-afc3-62269802f2b1" />
 
 ## 🚀 Features
 
