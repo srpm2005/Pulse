@@ -47,6 +47,7 @@ public class AlertService {
         return alertRepository.findByUser(user);
     }
 
+    @Transactional
     public void deleteAlert(Long id, String email) {
         alertRepository.findById(id).ifPresent(alert -> {
             if (alert.getUser().getEmail().equals(email)) {

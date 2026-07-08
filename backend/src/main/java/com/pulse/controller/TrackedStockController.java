@@ -11,6 +11,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
+import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -71,6 +72,7 @@ public class TrackedStockController {
         return ResponseEntity.ok(new TrackedStockResponse(saved));
     }
 
+    @Transactional
     @DeleteMapping("/{symbol}")
     public ResponseEntity<Void> removeTrackedStock(@PathVariable String symbol, Authentication authentication) {
         User user = getAuthUser(authentication);
