@@ -16,4 +16,9 @@ COPY --from=build /app/target/pulse-backend-0.0.1-SNAPSHOT.jar app.jar
 # Expose the default Spring Boot port
 EXPOSE 8080
 # Run the application
-ENTRYPOINT ["java", "-jar", "app.jar"]
+ENTRYPOINT ["java", \
+  "-Xmx256m", "-Xms64m", "-Xss512k", \
+  "-XX:+UseSerialGC", \
+  "-XX:MaxMetaspaceSize=128m", \
+  "-Djava.security.egd=file:/dev/./urandom", \
+  "-jar", "app.jar"]
