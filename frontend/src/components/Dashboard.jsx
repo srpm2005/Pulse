@@ -10,7 +10,6 @@ export default function DashboardContainer({ onLogout }) {
     const [currentView, setCurrentView] = useState('dashboard');
     const [trackedStocks, setTrackedStocks] = useState([]);
 
-    const [isSearchOpen, setIsSearchOpen] = useState(false);
     const [isAlertOpen, setIsAlertOpen] = useState(false);
     const [alertDefaultSymbol, setAlertDefaultSymbol] = useState('');
     const [userEmail, setUserEmail] = useState(() => {
@@ -76,10 +75,7 @@ export default function DashboardContainer({ onLogout }) {
         <>
             <Layout userEmail={userEmail} onLogout={onLogout} currentView={currentView} setCurrentView={setCurrentView}>
                 {currentView === 'dashboard' ? (
-                    <section className="view-section">
-                        <header className="view-header" style={{ borderBottom: 'none', paddingBottom: 0, justifyContent: 'flex-end', marginBottom: '24px' }}>
-                            <button className="btn-primary btn-sm" onClick={() => setIsSearchOpen(true)}>+ Add Stock</button>
-                        </header>
+                    <section className="view-section" style={{ paddingTop: '72px' }}>
 
                         <div className="stock-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '20px' }}>
                             {trackedStocks.length === 0 && (
@@ -101,9 +97,14 @@ export default function DashboardContainer({ onLogout }) {
                     </section>
                 ) : (
                     <section className="view-section">
-                        <header className="view-header">
-                            <h2>Price Alerts</h2>
-                            <button className="btn-primary btn-sm" onClick={() => { setAlertDefaultSymbol(''); setIsAlertOpen(true); }}>+ Create Alert</button>
+                        <header className="view-header" style={{ justifyContent: 'flex-end', borderBottom: 'none' }}>
+                            <button className="btn-primary btn-sm" style={{ display: 'flex', alignItems: 'center', gap: '6px' }} onClick={() => { setAlertDefaultSymbol(''); setIsAlertOpen(true); }}>
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                                </svg>
+                                Create Alert
+                            </button>
                         </header>
                         <AlertsTable />
                     </section>
@@ -111,8 +112,8 @@ export default function DashboardContainer({ onLogout }) {
             </Layout>
 
             <SearchModal
-                isOpen={isSearchOpen}
-                onClose={() => setIsSearchOpen(false)}
+                isOpen={currentView === 'dashboard'}
+                onClose={() => { }}
                 onAddStock={handleAddStock}
             />
 

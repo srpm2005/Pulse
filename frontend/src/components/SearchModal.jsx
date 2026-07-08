@@ -1,77 +1,120 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { apiFetch } from '../services/api';
+import '../searchbar.css';
 
-export default function SearchModal({ isOpen, onClose, onAddStock }) {
+export default function StockSearchBar({ isOpen, onAddStock }) {
     const [query, setQuery] = useState('');
     const [results, setResults] = useState([]);
     const [searching, setSearching] = useState(false);
-    const [error, setError] = useState(null);
+    const [activeIndex, setActiveIndex] = useState(-1);
+    const [isFocused, setIsFocused] = useState(false);
+    const inputRef = useRef(null);
+    const debounceRef = useRef(null);
 
-    if (!isOpen) return null;
-
-    const handleSearch = async (e) => {
-        const val = e.target.value;
-        setQuery(val);
-
-        if (val.length < 2) {
+    useEffect(() => {
+        if (isOpen) {
+            setQuery('');
             setResults([]);
-            return;
+            setActiveIndex(-1);
+            setTimeout(() => inputRef.current?.focus(), 50);
         }
+    }, [isOpen]);
+
+    useEffect(() => {
+        clearTimeout(debounceRef.current);
+        if (query.length < 2) { setResults([]); setSearching(false); return; }
 
         setSearching(true);
-        setError(null);
+        debounceRef.current = setTimeout(async () => {
+            try {
+                const data = await apiFetch(`/api/stocks/search?q=${encodeURIComponent(query)}`);
+                setResults(data || []);
+                setActiveIndex(-1);
+            } catch {
+                setResults([]);
+            } finally {
+                setSearching(false);
+            }
+        }, 300);
 
-        try {
-            const data = await apiFetch(`/api/stocks/search?q=${encodeURIComponent(val)}`);
-            setResults(data);
-        } catch (err) {
-            setError('Search failed');
-            setResults([]);
-        } finally {
-            setSearching(false);
-        }
+        return () => clearTimeout(debounceRef.current);
+    }, [query]);
+
+    const dismiss = () => {
+        setQuery('');
+        setResults([]);
+        setIsFocused(false);
     };
 
     const handleSelect = (item) => {
         onAddStock(item.instrumentKey, item.symbol, item.companyName);
-        setQuery('');
-        setResults([]);
-        onClose();
+        dismiss();
     };
 
+    const handleKeyDown = (e) => {
+        if (e.key === 'Escape') { dismiss(); return; }
+        if (e.key === 'ArrowDown') { setActiveIndex(i => Math.min(i + 1, results.length - 1)); e.preventDefault(); }
+        if (e.key === 'ArrowUp') { setActiveIndex(i => Math.max(i - 1, 0)); e.preventDefault(); }
+        if (e.key === 'Enter' && activeIndex >= 0) { handleSelect(results[activeIndex]); }
+    };
+
+    if (!isOpen) return null;
+
+    const showDropdown = isFocused && query.length >= 2;
+
     return (
-        <div className="modal-backdrop">
-            <div className="modal">
-                <div className="modal-header">
-                    <h3>Search Stock</h3>
-                    <button className="btn-close" onClick={onClose}>✕</button>
-                </div>
-                <div className="modal-body">
+        <>
+            {showDropdown && <div className="searchbar-backdrop" onMouseDown={dismiss} />}
+            <div className="searchbar-container">
+                <div className="searchbar-input-row">
+                    <svg className="searchbar-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                    </svg>
                     <input
+                        ref={inputRef}
                         type="text"
-                        placeholder="Search symbol or company name..."
+                        className="searchbar-input"
+                        placeholder="Search symbol or company..."
                         value={query}
-                        onChange={handleSearch}
-                        autoFocus
+                        onChange={e => setQuery(e.target.value)}
+                        onKeyDown={handleKeyDown}
+                        onFocus={() => setIsFocused(true)}
                     />
-                    <div className="search-results">
-                        {searching && <div style={{ padding: '12px', textAlign: 'center' }}>Searching...</div>}
-                        {!searching && error && <div style={{ padding: '12px', textAlign: 'center', color: 'var(--danger)' }}>{error}</div>}
-                        {!searching && !error && query.length >= 2 && results.length === 0 && (
-                            <div style={{ padding: '12px', textAlign: 'center', color: 'var(--text-secondary)' }}>No results found</div>
-                        )}
-                        {results.map(item => (
-                            <div key={item.instrumentKey} className="search-item" onClick={() => handleSelect(item)}>
-                                <div>
-                                    <div style={{ fontWeight: 600 }}>{item.symbol}</div>
-                                    <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>{item.companyName}</div>
-                                </div>
-                                <span style={{ color: 'var(--text-secondary)' }}>+</span>
+                    {searching && <span className="searchbar-spinner" />}
+                    {query && !searching && (
+                        <button className="searchbar-clear" onMouseDown={e => { e.preventDefault(); dismiss(); }}>✕</button>
+                    )}
+                    <kbd className="searchbar-esc" onMouseDown={e => { e.preventDefault(); dismiss(); }}>esc</kbd>
+                </div>
+
+                {showDropdown && results.length > 0 && (
+                    <div className="searchbar-results">
+                        {results.map((item, i) => (
+                            <div
+                                key={item.instrumentKey}
+                                className={`searchbar-result-item ${i === activeIndex ? 'active' : ''}`}
+                                onMouseDown={() => handleSelect(item)}
+                                onMouseEnter={() => setActiveIndex(i)}
+                            >
+                                <span className="result-symbol">{item.symbol}</span>
+                                <span className="result-name">{item.companyName}</span>
+                                <span className="result-add">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                        <circle cx="12" cy="12" r="10"></circle>
+                                        <line x1="12" y1="8" x2="12" y2="16"></line>
+                                        <line x1="8" y1="12" x2="16" y2="12"></line>
+                                    </svg>
+                                </span>
                             </div>
                         ))}
                     </div>
-                </div>
+                )}
+
+                {showDropdown && !searching && results.length === 0 && (
+                    <div className="searchbar-empty">No results for "<strong>{query}</strong>"</div>
+                )}
             </div>
-        </div>
+        </>
     );
 }
