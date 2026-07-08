@@ -16,13 +16,13 @@ public class EmailService {
     @Value("${spring.mail.username}")
     private String fromEmail;
 
-    public void sendPriceAlertEmail(String toEmail, String symbol, String companyName, double targetPrice, double currentPrice, String condition) {
+    public void sendPriceAlertEmail(String toEmail, String symbol, String companyName, double targetPrice, double currentPrice, String condition, String currency) {
         try {
             MimeMessage message = javaMailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
             String subject = "Pulse Alert: " + symbol + " has reached your target!";
-            String html = buildEmailHtml(symbol, companyName, targetPrice, currentPrice, condition);
+            String html = buildEmailHtml(symbol, companyName, targetPrice, currentPrice, condition, currency);
 
             helper.setFrom(fromEmail);
             helper.setTo(toEmail);
@@ -36,9 +36,12 @@ public class EmailService {
         }
     }
 
-    private String buildEmailHtml(String symbol, String companyName, double targetPrice, double currentPrice, String condition) {
+    private String buildEmailHtml(String symbol, String companyName, double targetPrice, double currentPrice, String condition, String currencyCode) {
         String trendColor = currentPrice >= targetPrice ? "#10b981" : "#ef4444";
         String statusText = currentPrice >= targetPrice ? "CONDITION MET" : "CONDITION MET"; // Alert triggered
+        
+        String currentFormatted = formatCurrency(currentPrice, currencyCode);
+        String targetFormatted = formatCurrency(targetPrice, currencyCode);
 
         return "<div style=\"margin:0;padding:40px 20px;background-color:#000000;font-family:-apple-system, BlinkMacSystemFont, 'Inter', sans-serif;color:#ffffff;\">" +
                 "  <div style=\"max-width:500px;margin:0 auto;background:#0a0a0a;border:1px solid #222222;border-radius:4px;overflow:hidden;\">" +
@@ -55,11 +58,11 @@ public class EmailService {
                 "        <table style=\"width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums;\">" +
                 "          <tr>" +
                 "            <td style=\"padding:8px 0;color:#888888;font-size:12px;border-bottom:1px solid #222222;\">Current Price</td>" +
-                "            <td style=\"padding:8px 0;text-align:right;color:#ffffff;font-size:14px;font-weight:600;border-bottom:1px solid #222222;\">$" + String.format("%.2f", currentPrice) + "</td>" +
+                "            <td style=\"padding:8px 0;text-align:right;color:#ffffff;font-size:14px;font-weight:600;border-bottom:1px solid #222222;\">" + currentFormatted + "</td>" +
                 "          </tr>" +
                 "          <tr>" +
                 "            <td style=\"padding:8px 0;color:#888888;font-size:12px;\">Target (" + condition + ")</td>" +
-                "            <td style=\"padding:8px 0;text-align:right;color:#888888;font-size:12px;font-weight:500;\">$" + String.format("%.2f", targetPrice) + "</td>" +
+                "            <td style=\"padding:8px 0;text-align:right;color:#888888;font-size:12px;font-weight:500;\">" + targetFormatted + "</td>" +
                 "          </tr>" +
                 "        </table>" +
                 "      </div>" +
@@ -67,5 +70,14 @@ public class EmailService {
                 "    </div>" +
                 "  </div>" +
                 "</div>";
+    }
+
+    private String formatCurrency(double amount, String currencyCode) {
+        if (currencyCode == null) currencyCode = "USD";
+        if (currencyCode.equals("INR")) return "₹" + String.format("%.2f", amount);
+        if (currencyCode.equals("EUR")) return "€" + String.format("%.2f", amount);
+        if (currencyCode.equals("GBP")) return "£" + String.format("%.2f", amount);
+        if (currencyCode.equals("JPY")) return "¥" + String.format("%.2f", amount);
+        return "$" + String.format("%.2f", amount);
     }
 }

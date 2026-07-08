@@ -84,7 +84,8 @@ public class AlertService {
                                 alert.getCompanyName(),
                                 target,
                                 currentPrice,
-                                alert.getCondition().name()
+                                alert.getCondition().name(),
+                                quote.getCurrency()
                         );
                         log.info("Triggered alert for {} and sent email to {}", alert.getSymbol(), alert.getUser().getEmail());
                     }
