@@ -33,8 +33,6 @@
     box-shadow: 0 8px 48px rgba(0, 0, 0, 0.9);
 }
 
-/* ─── Input row ─────────────────────────────────────────── */
-
 .searchbar-input-row {
     display: flex;
     align-items: center;
@@ -114,14 +112,10 @@
     border-color: #444;
 }
 
-/* ─── Divider between input and results ─────────────────── */
-
 .searchbar-results,
 .searchbar-empty {
     border-top: 1px solid #1a1a1a;
 }
-
-/* ─── Results list ──────────────────────────────────────── */
 
 .searchbar-results {
     max-height: 300px;
@@ -180,8 +174,6 @@
     color: #666;
 }
 
-/* ─── Empty state ───────────────────────────────────────── */
-
 .searchbar-empty {
     padding: 14px 16px;
     font-size: 12px;
@@ -192,4 +184,22 @@
 .searchbar-empty strong {
     color: #555;
     font-weight: 500;
+}
+
+/* ─── Responsive Breakpoints ───────────────────────────── */
+
+@media (max-width: 900px) {
+    .searchbar-container {
+        left: calc(160px + (100vw - 160px) / 2);
+        width: 480px;
+        max-width: calc(100vw - 196px);
+    }
+}
+
+@media (max-width: 640px) {
+    .searchbar-container {
+        left: calc(52px + (100vw - 52px) / 2);
+        width: calc(100vw - 80px);
+        max-width: 440px;
+    }
 }
