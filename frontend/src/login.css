@@ -44,12 +44,43 @@ h1 {
     margin-bottom: 20px;
 }
 
+.label-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.label-row label {
+    margin-bottom: 0;
+}
+
+.forgot-link {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    transition: color 120ms ease;
+}
+
+.forgot-link:hover {
+    color: var(--text-primary);
+}
+
 label {
     display: block;
     margin-bottom: 8px;
     font-size: 0.9rem;
     font-weight: 500;
     color: var(--text-secondary);
+}
+
+.code-input {
+    letter-spacing: 6px;
+    font-size: 1.25rem;
+    text-align: center;
+    font-family: var(--mono, ui-monospace, monospace);
+    font-weight: 600;
 }
 
 .error-banner {
@@ -61,6 +92,18 @@ label {
     margin-bottom: 24px;
     font-size: 0.9rem;
     text-align: center;
+}
+
+.success-banner {
+    background-color: rgba(16, 185, 129, 0.1);
+    color: var(--success);
+    border: 1px solid rgba(16, 185, 129, 0.25);
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 24px;
+    font-size: 0.9rem;
+    text-align: center;
+    line-height: 1.4;
 }
 
 #submit-btn {

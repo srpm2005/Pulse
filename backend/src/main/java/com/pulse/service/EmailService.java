@@ -36,6 +36,45 @@ public class EmailService {
         }
     }
 
+    public void sendPasswordResetEmail(String toEmail, String resetCode) {
+        try {
+            MimeMessage message = javaMailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+
+            String subject = "Pulse: Password Reset Verification Code";
+            String html = buildPasswordResetHtml(resetCode);
+
+            helper.setFrom(fromEmail);
+            helper.setTo(toEmail);
+            helper.setSubject(subject);
+            helper.setText(html, true);
+
+            javaMailSender.send(message);
+            System.out.println("Password reset email sent successfully via Gmail SMTP to: " + toEmail);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private String buildPasswordResetHtml(String resetCode) {
+        return "<div style=\"margin:0;padding:40px 20px;background-color:#000000;font-family:-apple-system, BlinkMacSystemFont, 'Inter', sans-serif;color:#ffffff;\">" +
+                "  <div style=\"max-width:500px;margin:0 auto;background:#0a0a0a;border:1px solid #222222;border-radius:4px;overflow:hidden;\">" +
+                "    <div style=\"padding:16px 20px;border-bottom:1px solid #222222;\">" +
+                "      <span style=\"margin:0;color:#888888;font-size:11px;font-weight:600;letter-spacing:0.5px;text-transform:uppercase;\">PULSE // SECURITY VERIFICATION</span>" +
+                "    </div>" +
+                "    <div style=\"padding:24px 20px;\">" +
+                "      <h2 style=\"margin:0 0 8px 0;font-size:18px;font-weight:600;color:#ffffff;\">Password Reset Request</h2>" +
+                "      <p style=\"margin:0 0 20px 0;color:#888888;font-size:13px;line-height:1.5;\">We received a request to reset your Pulse account password. Use the verification code below to set a new password:</p>" +
+                "      <div style=\"background:#111111;border:1px dashed #444444;border-radius:4px;padding:20px;text-align:center;margin:20px 0;\">" +
+                "        <div style=\"font-size:10px;color:#888888;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;font-weight:600;\">6-Digit Verification Code</div>" +
+                "        <div style=\"font-size:32px;font-weight:700;letter-spacing:10px;color:#ffffff;font-family:ui-monospace, Consolas, monospace;\">" + resetCode + "</div>" +
+                "      </div>" +
+                "      <p style=\"margin:0;color:#666666;font-size:11px;line-height:1.4;\">This code is valid for <strong>15 minutes</strong>. If you did not request a password reset, please ignore this email.</p>" +
+                "    </div>" +
+                "  </div>" +
+                "</div>";
+    }
+
     private String buildEmailHtml(String symbol, String companyName, double targetPrice, double currentPrice, String condition, String currencyCode) {
         String trendColor = currentPrice >= targetPrice ? "#10b981" : "#ef4444";
         String statusText = currentPrice >= targetPrice ? "CONDITION MET" : "CONDITION MET"; // Alert triggered
