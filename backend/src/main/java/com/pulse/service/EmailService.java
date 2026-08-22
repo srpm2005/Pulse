@@ -2,11 +2,13 @@ package com.pulse.service;
 
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class EmailService {
@@ -30,9 +32,9 @@ public class EmailService {
             helper.setText(html, true);
 
             javaMailSender.send(message);
-            System.out.println("Email sent successfully via Gmail SMTP to: " + toEmail);
+            log.info("Email sent successfully via Gmail SMTP to: {}", toEmail);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("Failed to send price alert email to {}: {}", toEmail, e.getMessage(), e);
         }
     }
 
@@ -50,9 +52,9 @@ public class EmailService {
             helper.setText(html, true);
 
             javaMailSender.send(message);
-            System.out.println("Password reset email sent successfully via Gmail SMTP to: " + toEmail);
+            log.info("Password reset email sent successfully via Gmail SMTP to: {}", toEmail);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("Failed to send password reset email to {}: {}", toEmail, e.getMessage(), e);
         }
     }
 
