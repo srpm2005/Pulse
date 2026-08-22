@@ -43,6 +43,11 @@ public class AuthController {
         return ResponseEntity.ok(Map.of("message", "Password successfully reset. You can now log in with your new password."));
     }
 
+    @GetMapping("/health")
+    public ResponseEntity<Map<String, String>> health() {
+        return ResponseEntity.ok(Map.of("status", "UP", "timestamp", String.valueOf(System.currentTimeMillis())));
+    }
+
     @GetMapping("/me")
     public ResponseEntity<Map<String, String>> me(Authentication authentication) {
         if (authentication == null || !authentication.isAuthenticated()) {

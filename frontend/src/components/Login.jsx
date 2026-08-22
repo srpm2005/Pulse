@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { apiFetch, setToken } from '../services/api';
+import { useState, useEffect } from 'react';
+import { apiFetch, setToken, warmupBackend } from '../services/api';
 import '../login.css';
 
 export default function Login({ onLoginComplete }) {
@@ -13,6 +13,25 @@ export default function Login({ onLoginComplete }) {
     const [error, setError] = useState(null);
     const [successMessage, setSuccessMessage] = useState(null);
     const [loading, setLoading] = useState(false);
+    const [coldStartNotice, setColdStartNotice] = useState(false);
+
+    // Warm up the backend server immediately when the login page opens
+    useEffect(() => {
+        warmupBackend();
+    }, []);
+
+    // Timer to notify the user if a cloud cold-start is in progress
+    useEffect(() => {
+        let timer;
+        if (loading) {
+            timer = setTimeout(() => {
+                setColdStartNotice(true);
+            }, 3500);
+        } else {
+            setColdStartNotice(false);
+        }
+        return () => clearTimeout(timer);
+    }, [loading]);
 
     const switchMode = (newMode) => {
         setMode(newMode);
@@ -192,6 +211,12 @@ export default function Login({ onLoginComplete }) {
                             {loading ? 'Processing...' : (mode === 'login' ? 'Sign In' : 'Sign Up')}
                         </button>
 
+                        {coldStartNotice && (
+                            <div className="cold-start-notice">
+                                <span>⚡ Waking up server from idle sleep, please hold on...</span>
+                            </div>
+                        )}
+
                         <div className="toggle-mode">
                             <span>{mode === 'login' ? "Don't have an account? " : "Already have an account? "}</span>
                             <button
@@ -224,6 +249,12 @@ export default function Login({ onLoginComplete }) {
                         <button type="submit" className="btn-primary" disabled={loading} style={{ width: '100%' }}>
                             {loading ? 'Sending Code...' : 'Send Reset Code'}
                         </button>
+
+                        {coldStartNotice && (
+                            <div className="cold-start-notice">
+                                <span>⚡ Connecting to cloud server, please hold on...</span>
+                            </div>
+                        )}
 
                         <div className="toggle-mode">
                             <button type="button" className="btn-link" onClick={() => switchMode('login')}>
@@ -288,6 +319,12 @@ export default function Login({ onLoginComplete }) {
                         <button type="submit" className="btn-primary" disabled={loading} style={{ width: '100%' }}>
                             {loading ? 'Resetting Password...' : 'Reset Password'}
                         </button>
+
+                        {coldStartNotice && (
+                            <div className="cold-start-notice">
+                                <span>⚡ Updating password on server, please hold on...</span>
+                            </div>
+                        )}
 
                         <div className="toggle-mode" style={{ display: 'flex', justifyContent: 'space-between' }}>
                             <button type="button" className="btn-link" onClick={() => switchMode('forgot')}>
