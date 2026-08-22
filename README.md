@@ -1,86 +1,87 @@
-# Pulse — Stock Dashboard
+# Pulse — Financial & Stock Dashboard
 
-Pulse is a modern, full-stack real-time stock tracking dashboard featuring a high-density "Terminal-Chic" user interface, stateless JWT authentication, and an automated background cron-scheduler for email price alerts.
+[![Live Demo](https://img.shields.io/badge/Live_Demo-Vercel-black?style=for-the-badge&logo=vercel)](https://pulse-peach-delta.vercel.app/)
+[![Backend](https://img.shields.io/badge/Backend-Render-46E3B7?style=for-the-badge&logo=render&logoColor=white)](https://pulse-015c.onrender.com)
+[![Spring Boot](https://img.shields.io/badge/Spring_Boot_3.2-6DB33F?style=for-the-badge&logo=springboot&logoColor=white)](https://spring.io/projects/spring-boot)
+[![React](https://img.shields.io/badge/React_19-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)](https://react.dev)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Neon_DB-336791?style=for-the-badge&logo=postgresql&logoColor=white)](https://neon.tech)
 
-<img width="1917" height="1022" alt="image" src="https://github.com/user-attachments/assets/21a43282-4eaf-4ce3-afc3-62269802f2b1" />
+> **Live Application:** [https://pulse-peach-delta.vercel.app/](https://pulse-peach-delta.vercel.app/)  
+> **Backend API:** [https://pulse-015c.onrender.com](https://pulse-015c.onrender.com)
 
-## 🚀 Features
+Pulse is a modern, full-stack real-time financial tracking dashboard featuring a high-density "Terminal-Chic" user interface, interactive portfolio management, auto-updating Chart.js sparklines, stateless JWT authentication, password recovery via 6-digit OTP codes, and an automated background cron scheduler for price alert notifications.
 
-- **Terminal-Chic UI:** A heavily optimized, grid-based interface enforcing high data density, true `#000` canvas backdrops, 1px `#222` slate borders, and dynamic Lucide SVG vectors. Built natively in React + Vite without bloated component libraries.
-- **Global Stock Tracking:** Live market data scraping natively hooked into Yahoo Finance. Supports US Equities, Indian NSE/BSE stocks, ETFs, and more. Tracked portfolios are securely synced to the database.
-- **Automated Price Alerts:** Set dynamic `ABOVE` or `BELOW` target thresholds. A background cron-scheduler silently polls the market every 5 minutes (localized to Indian Market Hours) and automatically triggers emails directly to your inbox via Gmail SMTP.
-- **Cloud-Optimized Backend:** The Spring Boot backend is aggressively tuned for Render's free tier, utilizing `-Xmx256m` caps, SerialGC, Hikari connection limiting (3 min/max), and Tomcat thread capping (20) to prevent OOM kills.
-- **Secure Authentication:** Stateless JSON Web Token (JWT) architecture backed by Spring Security and BCrypt password encoding. 
+<img width="1917" height="1022" alt="Pulse Dashboard Screenshot" src="https://github.com/user-attachments/assets/21a43282-4eaf-4ce3-afc3-62269802f2b1" />
+
+---
+
+## 🚀 Key Features
+
+- **Terminal-Chic UI:** A heavily optimized, grid-based interface enforcing high data density, true `#000` canvas backdrops, 1px `#222` slate borders, and dynamic SVG vectors. Built natively in React + Vite without bloated component libraries.
+- **Interactive Portfolio & Watchlist:** Live market data integration with Yahoo Finance. Supports US Equities (NASDAQ/NYSE), Indian stocks (NSE/BSE), ETFs, and more. Tracked portfolios are securely persisted in PostgreSQL.
+- **Auto-Updating Chart.js Sparklines:** Minimalist time-series trendlines on HTML5 canvas with dynamic color-coding (Emerald Green for gains, Crimson Red for dips) and in-place dataset updates.
+- **Automated Price Alerts:** Set dynamic `ABOVE` or `BELOW` target thresholds. A background cron scheduler silently evaluates alerts during active market hours and automatically dispatches styled HTML emails via Gmail SMTP.
+- **Forgot Password & 6-Digit OTP Reset:** Secure password recovery flow issuing time-limited (15-minute) 6-digit cryptographic verification codes delivered directly to user inboxes.
+- **Cloud-Optimized Backend:** The Spring Boot backend is tuned for low-memory container environments using `-Xmx256m` caps, SerialGC, Hikari connection pooling, and non-blocking security random generators.
+- **Secure Authentication:** Stateless JSON Web Token (JWT) architecture backed by Spring Security and BCrypt password hashing.
+
+---
 
 ## 🛠 Tech Stack
 
-**Frontend (Vite / React 18)**
-- React Hooks for local scope & API abstraction services (`apiFetch`)
-- Vanilla CSS3 Modules (Grid, Flexbox, Keyframes) mapping strict design tokens
-- Chart.js for real-time charting canvases
+| Layer | Technology |
+| :--- | :--- |
+| **Frontend** | React 19, Vite 8, Chart.js, Vanilla CSS Design System |
+| **Backend** | Java 17, Spring Boot 3.2.4 (Security, Data JPA, Mail, Scheduling) |
+| **Database** | Serverless PostgreSQL (Neon DB) with Flyway Migrations (`V1`–`V4`) |
+| **Deployment** | Vercel (Frontend SPA) + Render (Docker / Spring Boot Container) |
+| **External APIs** | Yahoo Finance (Market Data) + Gmail SMTP (STARTTLS on port 587) |
 
-**Backend (Java 17 / Spring Boot 3.2)**
-- Spring Security (JWT filter chaining)
-- Spring Mail (JavaMailSender / Gmail SMTP)
-- Spring Data JPA, Hibernate (open-in-view disabled)
-- Flyway Database Migrations
-- Yahoo Finance Native HTTP Scraper
-
-**Database**
-- Serverless PostgreSQL (Hosted via Neon DB)
+---
 
 ## ⚙️ Local Setup
 
 ### 1. Prerequisites
-- **Java 17+** and **Maven** installed.
-- **Node.js 18+** installed.
-- A **PostgreSQL** instance (e.g., Neon DB).
-- A **Google App Password** for SMTP mailing.
+- **Java 17+** and **Maven** (`mvn`)
+- **Node.js 18+** and **npm**
+- A **PostgreSQL** instance (e.g., [Neon DB](https://neon.tech))
+- A **Google App Password** for SMTP email delivery
 
 ### 2. Backend Configuration
-Navigate to the `backend` directory:
-```bash
-cd backend
-```
-Create a `.env` file in the `backend` folder securely referencing your own keys:
+Navigate to the `backend` directory and create `.env`:
 ```env
-# SMTP Alerting Configurations
-GMAIL_USER=your_real_gmail_address@gmail.com
+# SMTP Alerting Configuration
+GMAIL_USER=your_email@gmail.com
 GMAIL_APP_PASSWORD=your_16_digit_app_password
 
 # Database Configuration
-NEON_HOST=ep-...aws.neon.tech
+NEON_HOST=ep-rough-breeze-aoyyhe9m.c-2.ap-southeast-1.aws.neon.tech
 NEON_USER=neondb_owner
 NEON_PASSWORD=your_db_password
 NEON_DB=neondb
 
-# Security (Generate a random secure Base64 256-bit hash)
+# Security (Base64 256-bit secret key)
 JWT_SECRET=VnJ1blNlY3JldEtleU11c3RCZUF0TGVhc3QyNTZCaXRMb25nMTIzNDU2==
 ```
 
 ### 3. Run the Backend
-Ensure your database is active. Flyway will automatically execute SQL scripts (`V1` to `V3`) and scaffold your schema during startup.
+Flyway will automatically execute SQL migrations (`V1` to `V4`) during startup:
 ```bash
-mvn clean package -DskipTests
+cd backend
 mvn spring-boot:run
 ```
-*The backend will safely launch on `http://localhost:8080`.*
+*The backend will launch on `http://localhost:8080`.*
 
 ### 4. Run the React Frontend
-In a new terminal window, navigate to the `frontend` directory:
+In a new terminal window:
 ```bash
 cd frontend
 npm install
 npm run dev
 ```
+*The frontend will launch on `http://localhost:5173`.*
 
-### 5. Environment Variables
-Your frontend requires the following `.env` at the root of `frontend`:
-```env
-VITE_API_BASE_URL=http://localhost:8080
-```
-
-Open `http://localhost:5173` in your web browser. Register an account, log in, and enjoy your dashboard!
+---
 
 ## 📄 License
 This project is open-source and available under the [MIT License](LICENSE).
