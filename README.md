@@ -83,5 +83,46 @@ npm run dev
 
 ---
 
+## 📡 API Reference
+
+All protected endpoints require a standard Bearer token in the `Authorization` request header: `Bearer <jwt_token>`.
+
+### 🔐 Authentication & Account (`/api/auth`)
+
+| Method | Endpoint | Description | Auth Required |
+| :--- | :--- | :--- | :---: |
+| `POST` | `/api/auth/register` | Register a new user account | No |
+| `POST` | `/api/auth/login` | Authenticate user and receive JWT access token | No |
+| `POST` | `/api/auth/forgot-password` | Request a 15-minute 6-digit OTP verification email | No |
+| `POST` | `/api/auth/reset-password` | Validate OTP code and update account password | No |
+| `GET` | `/api/auth/me` | Retrieve profile information for authenticated user | Yes |
+| `GET` | `/api/auth/health` | Health check endpoint for uptime and container monitoring | No |
+
+### 📈 Market & Stock Data (`/api/stocks`)
+
+| Method | Endpoint | Description | Auth Required |
+| :--- | :--- | :--- | :---: |
+| `GET` | `/api/stocks/quote?symbol={symbol}` | Fetch real-time market quote, change %, and volume | No |
+| `GET` | `/api/stocks/search?q={query}` | Autocomplete search for equities and ticker symbols | No |
+| `GET` | `/api/stocks/chart?symbol={symbol}&range={range}` | Fetch historical time-series data for sparkline charts | No |
+
+### 💼 Portfolio & Watchlist (`/api/stocks/tracked`)
+
+| Method | Endpoint | Description | Auth Required |
+| :--- | :--- | :--- | :---: |
+| `GET` | `/api/stocks/tracked` | Fetch all tracked portfolio symbols for the current user | Yes |
+| `POST` | `/api/stocks/tracked` | Add a stock symbol to the user's tracked portfolio | Yes |
+| `DELETE` | `/api/stocks/tracked/{symbol}` | Remove a stock symbol from the tracked portfolio | Yes |
+
+### 🔔 Price Alerts (`/api/alerts`)
+
+| Method | Endpoint | Description | Auth Required |
+| :--- | :--- | :--- | :---: |
+| `GET` | `/api/alerts` | List all active price threshold alerts for the user | Yes |
+| `POST` | `/api/alerts` | Create a new target price alert (`ABOVE` / `BELOW` threshold) | Yes |
+| `DELETE` | `/api/alerts/{id}` | Delete a configured price alert by ID | Yes |
+
+---
+
 ## 📄 License
 This project is open-source and available under the [MIT License](LICENSE).
