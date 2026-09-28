@@ -59,3 +59,67 @@ export const apiFetch = async (path, options = {}) => {
         clearTimeout(timeoutId);
     }
 };
+
+export const getResearchPresets = () => apiFetch('/api/research/presets');
+
+export const streamResearch = ({ query, symbols = [], onStatus, onContext, onChunk, onComplete, onError }) => {
+    const token = getToken();
+    let url = `${BASE_URL}/api/research/stream?query=${encodeURIComponent(query)}`;
+    if (token) {
+        url += `&token=${encodeURIComponent(token)}`;
+    }
+    if (symbols && symbols.length > 0) {
+        symbols.forEach(s => {
+            url += `&symbols=${encodeURIComponent(s)}`;
+        });
+    }
+
+    const eventSource = new EventSource(url);
+
+    eventSource.addEventListener('status', (e) => {
+        try {
+            const data = JSON.parse(e.data);
+            if (onStatus) onStatus(data.message || data);
+        } catch (err) {
+            console.error('Error parsing status event', err);
+        }
+    });
+
+    eventSource.addEventListener('context', (e) => {
+        try {
+            const data = JSON.parse(e.data);
+            if (onContext) onContext(data);
+        } catch (err) {
+            console.error('Error parsing context event', err);
+        }
+    });
+
+    eventSource.addEventListener('chunk', (e) => {
+        try {
+            const data = JSON.parse(e.data);
+            if (onChunk) onChunk(data.content || '');
+        } catch (err) {
+            console.error('Error parsing chunk event', err);
+        }
+    });
+
+    eventSource.addEventListener('complete', (e) => {
+        try {
+            const data = JSON.parse(e.data);
+            if (onComplete) onComplete(data);
+        } catch (err) {
+            console.error('Error parsing complete event', err);
+        }
+        eventSource.close();
+    });
+
+    eventSource.addEventListener('error', (err) => {
+        if (onError) onError(err);
+        eventSource.close();
+    });
+
+    return () => {
+        eventSource.close();
+    };
+};
+

@@ -59,6 +59,12 @@ public class YahooFinanceService {
             double low = meta.path("regularMarketDayLow").asDouble(0.0);
             long volume = meta.path("regularMarketVolume").asLong(0);
             
+            double fiftyTwoWeekHigh = meta.path("fiftyTwoWeekHigh").asDouble(0.0);
+            double fiftyTwoWeekLow = meta.path("fiftyTwoWeekLow").asDouble(0.0);
+            String exchangeName = meta.path("exchangeName").asText("");
+            String companyName = meta.hasNonNull("longName") ? meta.path("longName").asText() :
+                    (meta.hasNonNull("shortName") ? meta.path("shortName").asText() : symbol);
+            
             double change = lastPrice - previousClose;
             double changePercent = previousClose != 0 ? (change / previousClose) * 100 : 0.0;
             
@@ -69,7 +75,7 @@ public class YahooFinanceService {
             return StockQuoteDto.builder()
                     .instrumentKey(symbol)
                     .symbol(symbol)
-                    .companyName(symbol) 
+                    .companyName(companyName) 
                     .currency(currency)
                     .lastPrice(lastPrice)
                     .change(change)
@@ -77,6 +83,9 @@ public class YahooFinanceService {
                     .high(high)
                     .low(low)
                     .volume(volume)
+                    .fiftyTwoWeekHigh(fiftyTwoWeekHigh)
+                    .fiftyTwoWeekLow(fiftyTwoWeekLow)
+                    .exchangeName(exchangeName)
                     .build();
 
         } catch (Exception e) {

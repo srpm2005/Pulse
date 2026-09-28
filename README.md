@@ -23,6 +23,7 @@ Pulse is a modern, full-stack real-time financial tracking dashboard featuring a
 - **Automated Price Alerts:** Set dynamic `ABOVE` or `BELOW` target thresholds. A background cron scheduler silently evaluates alerts during active market hours and automatically dispatches styled HTML emails via Gmail SMTP.
 - **Forgot Password & 6-Digit OTP Reset:** Secure password recovery flow issuing time-limited (15-minute) 6-digit cryptographic verification codes delivered directly to user inboxes.
 - **Cloud-Optimized Backend:** The Spring Boot backend is tuned for low-memory container environments using `-Xmx256m` caps, SerialGC, Hikari connection pooling, and non-blocking security random generators.
+- **RAG Quantitative Research Assistant:** Institutional-grade quantitative analysis engine computing SMA-20/50, 14-day RSI momentum, 52-week envelope position, and 30-day realized annualized volatility. Grounded retrieval eliminates LLM hallucinations by binding prompts strictly to verifiable Yahoo Finance telemetry and database alerts with interactive citations (`[DOC-n]`), live-streamed over Server-Sent Events (SSE).
 - **Secure Authentication:** Stateless JSON Web Token (JWT) architecture backed by Spring Security and BCrypt password hashing.
 
 ---
@@ -121,6 +122,14 @@ All protected endpoints require a standard Bearer token in the `Authorization` r
 | `GET` | `/api/alerts` | List all active price threshold alerts for the user | Yes |
 | `POST` | `/api/alerts` | Create a new target price alert (`ABOVE` / `BELOW` threshold) | Yes |
 | `DELETE` | `/api/alerts/{id}` | Delete a configured price alert by ID | Yes |
+
+### ⚡ Quantitative Research Assistant & RAG (`/api/research`)
+
+| Method | Endpoint | Description | Auth Required |
+| :--- | :--- | :--- | :---: |
+| `GET` | `/api/research/stream?query={q}&symbols={s}` | Server-Sent Events (SSE) live streaming research report with grounded facts and citations | Yes |
+| `POST` | `/api/research/query` | Synchronous grounded quantitative analysis report | Yes |
+| `GET` | `/api/research/presets` | Quick-start query presets for automated research | No |
 
 ---
 

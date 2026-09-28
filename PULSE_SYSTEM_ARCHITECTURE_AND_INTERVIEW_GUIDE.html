@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Pulse — Full System Architecture, Workflow & Technical Interview Guide</title>
+<style>
+  @page {
+    size: A4 portrait;
+    margin: 14mm 12mm 14mm 12mm;
+    @bottom-right {
+      content: counter(page);
+    }
+  }
+
+  * {
+    box-sizing: border-box;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    color: #1e293b;
+    background-color: #ffffff;
+    line-height: 1.5;
+    font-size: 11pt;
+    margin: 0;
+    padding: 0;
+  }
+
+  /* Cover & Header */
+  .cover {
+    background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
+    color: #ffffff;
+    padding: 36px 30px;
+    border-radius: 12px;
+    margin-bottom: 24px;
+    border: 1px solid #334155;
+  }
+
+  .cover-badge {
+    display: inline-block;
+    background: rgba(16, 185, 129, 0.15);
+    color: #10b981;
+    border: 1px solid #10b981;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 8.5pt;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 12px;
+  }
+
+  .cover h1 {
+    font-size: 24pt;
+    margin: 0 0 8px 0;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: #ffffff;
+  }
+
+  .cover p {
+    font-size: 11pt;
+    color: #94a3b8;
+    margin: 0 0 16px 0;
+    max-width: 90%;
+  }
+
+  .meta-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 12px;
+    border-radius: 8px;
+    font-size: 9pt;
+  }
+
+  .meta-item strong {
+    display: block;
+    color: #38bdf8;
+    font-size: 8pt;
+    text-transform: uppercase;
+    margin-bottom: 2px;
+  }
+
+  /* Section Styling */
+  h2 {
+    font-size: 15pt;
+    font-weight: 700;
+    color: #0f172a;
+    border-bottom: 2px solid #e2e8f0;
+    padding-bottom: 6px;
+    margin-top: 24px;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  h3 {
+    font-size: 12pt;
+    font-weight: 700;
+    color: #1e293b;
+    margin-top: 16px;
+    margin-bottom: 6px;
+  }
+
+  h4 {
+    font-size: 10.5pt;
+    font-weight: 700;
+    color: #334155;
+    margin-top: 12px;
+    margin-bottom: 4px;
+  }
+
+  p {
+    margin: 0 0 8px 0;
+    text-align: justify;
+  }
+
+  /* Page Break Utilities */
+  .page-break {
+    page-break-before: always;
+  }
+
+  .avoid-break {
+    page-break-inside: avoid;
+  }
+
+  /* Callout Boxes */
+  .callout {
+    background-color: #f8fafc;
+    border-left: 4px solid #3b82f6;
+    padding: 10px 14px;
+    border-radius: 0 6px 6px 0;
+    margin: 10px 0;
+    font-size: 9.5pt;
+  }
+
+  .callout.interview {
+    background-color: #f0fdf4;
+    border-left-color: #10b981;
+  }
+
+  .callout.interview strong {
+    color: #047857;
+  }
+
+  .callout.warning {
+    background-color: #fffbeb;
+    border-left-color: #f59e0b;
+  }
+
+  .callout.warning strong {
+    color: #b45309;
+  }
+
+  /* Tables */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 12px 0;
+    font-size: 9pt;
+  }
+
+  th, td {
+    padding: 7px 10px;
+    text-align: left;
+    border: 1px solid #cbd5e1;
+  }
+
+  th {
+    background-color: #f1f5f9;
+    color: #0f172a;
+    font-weight: 700;
+  }
+
+  tr:nth-child(even) {
+    background-color: #f8fafc;
+  }
+
+  /* Code blocks & Diagrams */
+  pre {
+    background-color: #0f172a;
+    color: #e2e8f0;
+    padding: 10px 14px;
+    border-radius: 6px;
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 8.5pt;
+    overflow-x: hidden;
+    white-space: pre-wrap;
+    word-break: break-all;
+    line-height: 1.35;
+    margin: 8px 0;
+  }
+
+  code {
+    font-family: Consolas, "Courier New", monospace;
+    background-color: #f1f5f9;
+    color: #0369a1;
+    padding: 1px 4px;
+    border-radius: 3px;
+    font-size: 9pt;
+  }
+
+  /* Workflow Steps */
+  .step-box {
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    padding: 10px 14px;
+    margin-bottom: 10px;
+    background-color: #ffffff;
+  }
+
+  .step-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 700;
+    color: #0f172a;
+    margin-bottom: 4px;
+  }
+
+  .step-badge {
+    background-color: #0284c7;
+    color: #ffffff;
+    font-size: 8pt;
+    padding: 2px 7px;
+    border-radius: 4px;
+    font-weight: bold;
+  }
+
+  /* Formulas */
+  .formula-box {
+    background: #f1f5f9;
+    border-left: 3px solid #6366f1;
+    padding: 6px 12px;
+    font-family: "Cambria Math", "Times New Roman", serif;
+    font-size: 10pt;
+    margin: 6px 0;
+  }
+
+  ul, ol {
+    margin: 0 0 8px 0;
+    padding-left: 20px;
+  }
+
+  li {
+    margin-bottom: 3px;
+  }
+</style>
+</head>
+<body>
+
+<!-- COVER SECTION -->
+<div class="cover avoid-break">
+  <span class="cover-badge">Complete Technical Architecture &amp; Interview Dossier</span>
+  <h1>Pulse — Real-Time Stock Market Dashboard</h1>
+  <p>A comprehensive engineering and theoretical guide to the full-stack architecture, stateless JWT security, quantitative indicator algorithms, real-time RAG pipeline with Google Gemini, and automated background schedulers.</p>
+  
+  <div class="meta-grid">
+    <div class="meta-item">
+      <strong>Core Backend</strong>
+      <span>Java 17, Spring Boot 3.2.4</span>
+    </div>
+    <div class="meta-item">
+      <strong>Frontend SPA</strong>
+      <span>React 19, Vite 8, Chart.js</span>
+    </div>
+    <div class="meta-item">
+      <strong>Database</strong>
+      <span>PostgreSQL (Neon) + Flyway</span>
+    </div>
+    <div class="meta-item">
+      <strong>AI Engine</strong>
+      <span>Google Gemini 3.5 Flash (SSE)</span>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 1: ARCHITECTURE OVERVIEW -->
+<div class="avoid-break">
+  <h2>1. System Architecture &amp; The Request Lifecycle</h2>
+  <p>Pulse is engineered as a decoupled, full-stack financial monitoring platform designed for high data density, low-latency market analysis, and zero-hallucination research. The architecture enforces strict separation of concerns across a 6-tier backend hierarchy.</p>
+  
+  <pre>
+[ React 19 Frontend Client (Chart.js / EventSource) ]
+                     │ HTTPS / REST / SSE
+                     ▼
+┌────────────────────────────────────────────────────────────────────────┐
+│ 1. SERVLET CONTAINER &amp; FILTER CHAIN (Embedded Tomcat)                  │
+│    ├── CorsFilter (WebConfig: Allowed Origins, Methods, Headers)       │
+│    └── JwtAuthFilter (Intercepts 'Authorization: Bearer' &amp; '?token=')  │
+│        └── SecurityContextHolder (Populates User Authentication)       │
+├────────────────────────────────────────────────────────────────────────┤
+│ 2. DISPATCHER SERVLET (Spring MVC Front Controller)                    │
+│    └── HandlerMapping -> Resolves route to target Controller           │
+├────────────────────────────────────────────────────────────────────────┤
+│ 3. CONTROLLER LAYER (@RestController)                                  │
+│    ├── AuthController          -> /api/auth                            │
+│    ├── StockController         -> /api/stocks                          │
+│    ├── TrackedStockController  -> /api/stocks/tracked                  │
+│    ├── AlertController         -> /api/alerts                          │
+│    └── ResearchController      -> /api/research                        │
+├────────────────────────────────────────────────────────────────────────┤
+│ 4. SERVICE LAYER (@Service - Business Logic &amp; Orchestration)           │
+│    ├── AuthService &amp; JwtService (Auth, Password Hashing &amp; Tokens)      │
+│    ├── YahooFinanceService (Market Telemetry, OHLCV Bars, Search)      │
+│    ├── AlertService &amp; EmailService (Target Alerting &amp; Gmail SMTP)      │
+│    └── Research Engine: RAGRetrievalService, QuantitativeEngineService, │
+│                         LlmResearchService (Gemini Streaming)          │
+├────────────────────────────────────────────────────────────────────────┤
+│ 5. DATA ACCESS LAYER (Spring Data JPA / Hibernate)                     │
+│    ├── UserRepository, TrackedStockRepository, PriceAlertRepository    │
+│    └── Flyway Migration Engine (V1 -> V4 Versioned Migrations)         │
+├────────────────────────────────────────────────────────────────────────┤
+│ 6. ASYNCHRONOUS &amp; BACKGROUND WORKERS                                   │
+│    ├── AlertScheduler (@Scheduled Cron: 0 */2 3-10 * * MON-FRI)        │
+│    └── TaskExecutor (@Async Thread Pools for SSE Research Streaming)   │
+└────────────────────────────────────────────────────────────────────────┘
+          │                              │                          │
+          ▼                              ▼                          ▼
+ [ PostgreSQL Neon DB ]         [ Yahoo Finance API ]     [ Google Gemini 3.5 ]
+  </pre>
+
+  <div class="callout interview">
+    <strong>How to Explain This to an Interviewer:</strong><br>
+    <em>"My backend is structured around Spring Boot 3 layered architecture. Every request passes through a custom <code>JwtAuthFilter</code> that supports both HTTP Bearer headers and query parameters (for SSE streams). Valid requests are routed to controllers, which delegate to domain services. Market telemetry is retrieved directly from Yahoo Finance, relational data is persisted in serverless PostgreSQL via Spring Data JPA, and long-running research streams execute asynchronously via Spring's <code>@Async</code> thread pools."</em>
+  </div>
+</div>
+
+<!-- PAGE BREAK: SECURITY & AUTHENTICATION -->
+<div class="page-break"></div>
+
+<h2>2. Authentication, Authorization &amp; Password Recovery Flow</h2>
+
+<div class="step-box avoid-break">
+  <div class="step-header">
+    <span class="step-badge">Subsystem 1</span>
+    <span>Stateless JSON Web Token (JWT) Security Architecture</span>
+  </div>
+  <p>Pulse avoids server-side session memory overhead by employing a 100% stateless JWT token model. No session state or cookies are stored on the server, permitting horizontal backend scaling.</p>
+  <ul>
+    <li><strong>Password Hashing:</strong> Passwords are never stored in plaintext. They are salted and encrypted using <code>BCryptPasswordEncoder</code> (work factor 10) in <code>SecurityConfig.java</code>.</li>
+    <li><strong>Token Lifecycle:</strong> Upon successful login, <code>JwtService.java</code> generates a compact HMAC-SHA256 signed token. The payload contains the user's email (Subject), issued timestamp (iat), and 24-hour expiration window (<code>86,400,000 ms</code>).</li>
+    <li><strong>Dual-Vector Token Interception:</strong> Standard browser <code>EventSource</code> APIs (used for streaming AI research) cannot send custom <code>Authorization</code> request headers. To solve this, <code>JwtAuthFilter.java</code> inspects:
+      <ol>
+        <li>Header: <code>Authorization: Bearer &lt;token&gt;</code> (used by standard fetch REST requests).</li>
+        <li>Query Parameter: <code>?token=&lt;jwt&gt;</code> (used exclusively by native EventSource SSE connections).</li>
+      </ol>
+    </li>
+    <li><strong>Spring Security Context:</strong> Once validated, a <code>UsernamePasswordAuthenticationToken</code> is bound to <code>SecurityContextHolder.getContext()</code>, making the authenticated user accessible in any downstream controller via <code>Authentication authentication</code>.</li>
+  </ul>
+</div>
+
+<div class="step-box avoid-break">
+  <div class="step-header">
+    <span class="step-badge">Subsystem 2</span>
+    <span>Forgot Password Flow via 6-Digit Cryptographic OTP</span>
+  </div>
+  <p>To eliminate insecure reset links, Pulse uses a time-limited 6-digit One-Time Password (OTP) verification flow:</p>
+  
+  <pre>
+[ User Requests Reset ] ──► POST /api/auth/forgot-password {email}
+                                │
+                                ▼
+                       AuthService generates 6-digit OTP (SecureRandom)
+                       Saves hash in 'password_reset_tokens' (15 min expiry)
+                                │
+                                ▼
+                       EmailService dispatches branded HTML email via Gmail SMTP
+                                │
+                                ▼
+[ User Inputs Code ]    ──► POST /api/auth/reset-password {email, otp, newPassword}
+                                │
+                                ▼
+                       Validates: token matches, expiry > now(), used == false
+                       Updates: password = BCrypt(newPassword), used = true
+  </pre>
+</div>
+
+<!-- SECTION 3: REAL-TIME TELEMETRY & SPARKLINE CHARTS -->
+<div class="avoid-break">
+  <h2>3. Real-Time Telemetry &amp; Canvas Sparkline Visualizations</h2>
+  <p>Rather than relying on mock datasets, Pulse directly interfaces with Yahoo Finance REST endpoints to provide real-time equity quotes and intraday historical series.</p>
+  
+  <table>
+    <thead>
+      <tr>
+        <th style="width: 25%;">Endpoint</th>
+        <th style="width: 25%;">External Provider URL</th>
+        <th style="width: 50%;">Data Extracted &amp; Business Processing</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>GET /api/stocks/search?q=...</code></td>
+        <td><code>query2.finance.yahoo.com/v1/finance/search</code></td>
+        <td>Live equity and ETF autocomplete. Filters out bonds and options; returns clean symbol, name, and exchange.</td>
+      </tr>
+      <tr>
+        <td><code>GET /api/stocks/quote?symbol=...</code></td>
+        <td><code>query1.finance.yahoo.com/v8/finance/chart/{symbol}</code></td>
+        <td>Parses regular market price, day change, % change, volume, 52-week high, and 52-week low.</td>
+      </tr>
+      <tr>
+        <td><code>GET /api/stocks/chart?symbol=...&amp;range=1d</code></td>
+        <td><code>query1.finance.yahoo.com/v8/finance/chart/{symbol}?interval=5m</code></td>
+        <td>Pulls 5-minute intraday timestamps and closing prices. Formats parallel arrays for Chart.js canvas rendering.</td>
+      </tr>
+      <tr>
+        <td><code>POST /api/stocks/tracked</code></td>
+        <td>Internal PostgreSQL (Neon DB)</td>
+        <td>Persists stock in user's watchlist with a composite database unique constraint <code>(user_id, symbol)</code>.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="callout interview">
+    <strong>Interview Tip (Chart.js Sparklines):</strong><br>
+    <em>"In the React frontend, I used Chart.js drawing directly to an HTML5 Canvas rather than heavyweight SVG charts (like D3 or TradingView). When polling 10+ stocks simultaneously, canvas rendering avoids creating hundreds of DOM elements. The sparkline dynamically samples intraday bars and color-codes the stroke: <strong>Emerald Green (#10B981)</strong> for net gains, or <strong>Crimson Red (#EF4444)</strong> for intraday drops."</em>
+  </div>
+</div>
+
+<!-- PAGE BREAK: QUANT ENGINE -->
+<div class="page-break"></div>
+
+<h2>4. The Pulse Quantitative Engine: Mathematical Theory</h2>
+<p>Unlike standard text applications, Pulse contains a built-in algorithmic math engine implemented in <code>QuantitativeEngineService.java</code>. It takes raw 30-day historical closing price series and calculates deterministic mathematical indicators on the fly:</p>
+
+<div class="step-box avoid-break">
+  <h4>A. Simple Moving Average (SMA-20 &amp; SMA-50)</h4>
+  <p>The unweighted mean of the previous $N$ daily closing prices:</p>
+  <div class="formula-box">
+    $$\text{SMA}_N = \frac{1}{N} \sum_{i=1}^{N} P_i \quad \text{where } N \in \{20, 50\}$$
+  </div>
+  <p><strong>Trend Regime Classification:</strong></p>
+  <ul>
+    <li><code>Price > SMA20 && SMA20 >= SMA50</code> &rarr; <code>STRONG_BULLISH</code></li>
+    <li><code>Price > SMA20 && SMA20 < SMA50</code> &rarr; <code>MODERATE_BULLISH</code></li>
+    <li><code>Price < SMA20 && SMA20 <= SMA50</code> &rarr; <code>STRONG_BEARISH</code></li>
+    <li><code>Price < SMA20 && SMA20 > SMA50</code> &rarr; <code>MODERATE_BEARISH</code></li>
+  </ul>
+</div>
+
+<div class="step-box avoid-break">
+  <h4>B. 14-Day Relative Strength Index (RSI-14)</h4>
+  <p>Measures the speed and change of price movements to identify overbought or oversold market conditions:</p>
+  <div class="formula-box">
+    $$\text{RS} = \frac{\text{Average Gain over 14 Days}}{\text{Average Loss over 14 Days}}, \quad \text{RSI} = 100 - \left( \frac{100}{1 + \text{RS}} \right)$$
+  </div>
+  <p><strong>Momentum Regime:</strong></p>
+  <ul>
+    <li>$\text{RSI} \ge 70.0$ &rarr; <strong>OVERBOUGHT</strong> (Elevated mean-reversion risk)</li>
+    <li>$\text{RSI} \le 30.0$ &rarr; <strong>OVERSOLD</strong> (Potential bounce or capitulation)</li>
+    <li>$30.0 < \text{RSI} < 70.0$ &rarr; <strong>NEUTRAL MOMENTUM</strong></li>
+  </ul>
+</div>
+
+<div class="step-box avoid-break">
+  <h4>C. 30-Day Realized Annualized Volatility</h4>
+  <p>Measures historical statistical price dispersion using continuous log-returns scaled by standard exchange trading days ($252$ days):</p>
+  <div class="formula-box">
+    $$r_i = \ln\left(\frac{P_i}{P_{i-1}}\right), \quad \sigma_{\text{daily}} = \sqrt{\frac{1}{n-1}\sum_{i=1}^{n}(r_i - \bar{r})^2}, \quad \sigma_{\text{annual}} = \sigma_{\text{daily}} \times \sqrt{252} \times 100$$
+  </div>
+  <p>Volatilities above $35\%$ are classified as <code>ELEVATED_VOLATILITY</code>, alerting users to price risk.</p>
+</div>
+
+<div class="step-box avoid-break">
+  <h4>D. 52-Week Range Position</h4>
+  <p>Calculates where the current price sits relative to its 1-year trading envelope:</p>
+  <div class="formula-box">
+    $$\text{Range Position (\%)} = \left(\frac{\text{Current Price} - \text{52W Low}}{\text{52W High} - \text{52W Low}}\right) \times 100$$
+  </div>
+</div>
+
+<!-- PAGE BREAK: RAG IMPLEMENTATION -->
+<div class="page-break"></div>
+
+<h2>5. The RAG Pipeline &amp; AI Assistant (Exclusively Google Gemini)</h2>
+
+<div class="callout warning">
+  <strong>The Problem RAG Solves in Pulse:</strong><br>
+  Standard LLMs (like ChatGPT or standalone Gemini) fail in finance because equity prices change every second and training cutoff dates cause hallucinations. Pulse implements a <strong>Real-Time Factual Grounding RAG Pipeline</strong>. It acts as an open-book exam: the backend gathers live exchange facts first, attaches strict anti-hallucination directives, and requires Gemini to cite source document IDs (e.g. <code>[DOC-1]</code>).
+</div>
+
+<h3>The 5-Stage RAG Execution Flow</h3>
+
+<pre>
+[ User Prompt: "Analyze Microsoft momentum and alerts" ]
+                         │
+                         ▼
+┌────────────────────────────────────────────────────────────────────────┐
+│ STAGE 1: DYNAMIC ENTITY RESOLUTION (RAGRetrievalService)               │
+│ • Regex extracts candidates; filters prompt stopwords ("ANALYZE", etc.)│
+│ • resolveToTicker("Microsoft") -> Queries Yahoo Search API             │
+│ • Resolves "Microsoft" -> "MSFT" &amp; caches in ConcurrentHashMap         │
+└────────────────────────────────────────────────────────────────────────┘
+                         │
+                         ▼
+┌────────────────────────────────────────────────────────────────────────┐
+│ STAGE 2: MULTI-SOURCE GROUNDED CONTEXT RETRIEVAL                       │
+│ • Source A (Live Telemetry): Yahoo API -> Last price, day range, volume│
+│ • Source B (Quant Engine): Java Math -> SMA-20/50, RSI-14, Volatility  │
+│ • Source C (Relational DB): PostgreSQL -> User active price alerts     │
+│ Assembles into: DOC-1 (Telemetry), DOC-2 (Quant Indicators), DOC-3 (Alerts)
+└────────────────────────────────────────────────────────────────────────┘
+                         │
+                         ▼
+┌────────────────────────────────────────────────────────────────────────┐
+│ STAGE 3: SSE CONTEXT EMISSION &amp; PROMPT AUGMENTATION                    │
+│ • Emits SSE 'context' event with document cards to React client        │
+│ • Injects Strict Grounding Directive into prompt:                      │
+│   "1. Formulate analysis STRICTLY using provided documents.           │
+│    2. DO NOT invent metrics, prices, or dates.                         │
+│    3. Every metric MUST cite its source document tag, e.g. [DOC-1]."   │
+└────────────────────────────────────────────────────────────────────────┘
+                         │
+                         ▼
+┌────────────────────────────────────────────────────────────────────────┐
+│ STAGE 4: GEMINI 3.5 FLASH SSE TOKEN STREAMING (LlmResearchService)     │
+│ • Connects to Google Generative Language API (gemini-3.5-flash)        │
+│ • Streams text deltas over SSE event 'chunk' to React UI               │
+│ • Offline Fallback: If Gemini API fails, built-in Java Quant Engine    │
+│   synthesizes the grounded report with zero downtime!                  │
+└────────────────────────────────────────────────────────────────────────┘
+                         │
+                         ▼
+┌────────────────────────────────────────────────────────────────────────┐
+│ STAGE 5: CLIENT-SIDE INTERACTIVE GROUNDING (ResearchAssistant.jsx)     │
+│ • Parses markdown stream in real time.                                 │
+│ • Transforms '[DOC-n]' into clickable badge chips (⚡ DOC-n).         │
+│ • Clicking badge smoothly scrolls &amp; highlights corresponding data card!│
+└────────────────────────────────────────────────────────────────────────┘
+</pre>
+
+<div class="callout interview">
+  <strong>Why No Vector Database Was Used (Crucial Interview Answer):</strong><br>
+  <em>"Interviewers often ask: 'Where is your Vector DB like Pinecone or Chroma?'  
+  My answer: Vector databases are designed for static, unstructured text (like searching company PDFs). In stock markets, prices change every second; vector embeddings would become stale immediately. Furthermore, calculating an RSI or a 50-day moving average requires <strong>exact deterministic mathematics</strong>, not fuzzy semantic approximation. Therefore, real-time API retrieval and on-the-fly math calculation is the architecturally superior design."</em>
+</div>
+
+<!-- PAGE BREAK: BACKGROUND SCHEDULER & EMAIL -->
+<div class="page-break"></div>
+
+<h2>6. Automated Background Scheduler &amp; Alert Notification Engine</h2>
+
+<p>Pulse features a resilient background worker implemented in <code>AlertScheduler.java</code> and <code>EmailService.java</code> that automates price threshold monitoring without requiring any user browser to be open.</p>
+
+<pre>
+┌────────────────────────────────────────────────────────────────────────┐
+│ Spring @Scheduled Cron: "0 */2 3-10 * * MON-FRI" (Market Hours)        │
+└────────────────────────────────────────────────────────────────────────┘
+                                 │
+                                 ▼
+┌────────────────────────────────────────────────────────────────────────┐
+│ 1. FETCH ACTIVE ALERTS                                                 │
+│ priceAlertRepository.findByTriggeredFalse()                            │
+└────────────────────────────────────────────────────────────────────────┘
+                                 │
+                                 ▼
+┌────────────────────────────────────────────────────────────────────────┐
+│ 2. DEDUPLICATE REQUESTS (GROUP BY SYMBOL)                              │
+│ alerts.stream().collect(Collectors.groupingBy(PriceAlert::getSymbol))  │
+│ -> 50 users tracking NVDA results in only 1 Yahoo API call, not 50!    │
+└────────────────────────────────────────────────────────────────────────┘
+                                 │
+                                 ▼
+┌────────────────────────────────────────────────────────────────────────┐
+│ 3. EVALUATE THRESHOLD BREACH                                           │
+│ • Condition ABOVE: currentPrice >= targetPrice                         │
+│ • Condition BELOW: currentPrice <= targetPrice                         │
+└────────────────────────────────────────────────────────────────────────┘
+                                 │
+                                 ▼
+┌────────────────────────────────────────────────────────────────────────┐
+│ 4. DISPATCH EMAIL &amp; UPDATE DATABASE (ANTI-SPAM GUARANTEE)               │
+│ • alert.setTriggered(true) &amp; commit to PostgreSQL immediately.         │
+│ • EmailService dispatches responsive HTML email via Gmail SMTP:587.    │
+└────────────────────────────────────────────────────────────────────────┘
+</pre>
+
+<div class="step-box avoid-break">
+  <h4>Key Engineering Highlights of the Scheduler:</h4>
+  <ul>
+    <li><strong>Zero Rate-Limit Exhaustion:</strong> By grouping alerts by stock symbol via Java Streams, the scheduler makes $O(N_{\text{unique symbols}})$ HTTP calls instead of $O(N_{\text{total alerts}})$.</li>
+    <li><strong>State Machine &amp; Idempotency:</strong> Setting <code>triggered = true</code> in PostgreSQL before dispatching notifications guarantees that users receive <strong>exactly one email alert</strong> when their target is reached, rather than an email every 2 minutes.</li>
+    <li><strong>Non-Blocking Thread Architecture:</strong> Spring Boot's scheduling pool runs on a distinct background worker thread, ensuring heavy batch checks never block Tomcat HTTP request threads.</li>
+  </ul>
+</div>
+
+<!-- SECTION 7: DATABASE MIGRATIONS -->
+<div class="avoid-break">
+  <h2>7. Database Schema &amp; Flyway Versioning</h2>
+  <p>All database tables in PostgreSQL (Neon Cloud) are managed via version-controlled SQL migrations located in <code>backend/src/main/resources/db/migration/</code>:</p>
+
+  <table>
+    <thead>
+      <tr>
+        <th style="width: 15%;">Version</th>
+        <th style="width: 25%;">Migration File</th>
+        <th style="width: 20%;">Table Created</th>
+        <th style="width: 40%;">Schema Constraints &amp; Details</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>V1</code></td>
+        <td><code>V1__Create_Users_Table.sql</code></td>
+        <td><code>users</code></td>
+        <td><code>id BIGSERIAL PRIMARY KEY</code>, <code>email VARCHAR UNIQUE NOT NULL</code>, <code>password VARCHAR NOT NULL</code>, <code>created_at TIMESTAMP</code>.</td>
+      </tr>
+      <tr>
+        <td><code>V2</code></td>
+        <td><code>V2__Create_Tracked_Stocks_Table.sql</code></td>
+        <td><code>tracked_stocks</code></td>
+        <td>Foreign key to <code>users(id) ON DELETE CASCADE</code>. Composite unique index: <code>UNIQUE(user_id, symbol)</code>.</td>
+      </tr>
+      <tr>
+        <td><code>V3</code></td>
+        <td><code>V3__Create_Price_Alerts_Table.sql</code></td>
+        <td><code>price_alerts</code></td>
+        <td>Stores <code>symbol</code>, <code>target_price</code>, <code>condition (ABOVE/BELOW)</code>, <code>triggered BOOLEAN DEFAULT FALSE</code>.</td>
+      </tr>
+      <tr>
+        <td><code>V4</code></td>
+        <td><code>V4__Create_Password_Reset_Tokens.sql</code></td>
+        <td><code>password_reset_tokens</code></td>
+        <td>Stores 6-digit cryptographic OTP, <code>expiry_date TIMESTAMP</code>, <code>used BOOLEAN DEFAULT FALSE</code>.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- PAGE BREAK: TOP INTERVIEW QUESTIONS -->
+<div class="page-break"></div>
+
+<h2>8. Top 15 Technical Interview Questions &amp; Answers</h2>
+
+<div class="step-box avoid-break">
+  <strong>Q1: Why did you choose stateless JWT over HTTP Session cookies?</strong><br>
+  <em>"Session cookies store session state in server RAM, which breaks horizontal scalability when running multiple instances behind a load balancer without sticky sessions or distributed Redis stores. JWT is stateless: the server signs the token using HMAC-SHA256, and all state (user identity, expiration) lives inside the token itself, reducing server memory to zero."</em>
+</div>
+
+<div class="step-box avoid-break">
+  <strong>Q2: How does your backend handle Server-Sent Events (SSE) authentication?</strong><br>
+  <em>"Standard browser <code>EventSource</code> does not allow custom headers like <code>Authorization: Bearer</code>. I engineered <code>JwtAuthFilter</code> to extract JWT tokens from both the <code>Authorization</code> header and the <code>?token=...</code> query parameter. It validates the token signature, sets up Spring's <code>SecurityContext</code>, and permits authenticated SSE streaming."</em>
+</div>
+
+<div class="step-box avoid-break">
+  <strong>Q3: Why Server-Sent Events (SSE) instead of WebSockets for the research assistant?</strong><br>
+  <em>"WebSockets are bidirectional, requiring custom protocol framing, handshake upgrades, and continuous connection state. AI token streaming is strictly <strong>unidirectional</strong> (server pushing text tokens to client). SSE runs natively over standard HTTP/1.1 or HTTP/2, includes built-in browser reconnection, passes through enterprise proxies, and is much lighter on memory."</em>
+</div>
+
+<div class="step-box avoid-break">
+  <strong>Q4: Why did you not use a Vector Database for your RAG engine?</strong><br>
+  <em>"Vector DBs are built for static text embeddings. Financial market data changes every second—embeddings would become stale immediately. Furthermore, calculating technical indicators (SMA, RSI, Volatility) requires exact deterministic math, not approximate cosine similarity. Pulse retrieves live exchange data on-demand and computes indicators in Java, guaranteeing zero staleness and zero math hallucinations."</em>
+</div>
+
+<div class="step-box avoid-break">
+  <strong>Q5: How do you prevent LLMs from hallucinating stock prices?</strong><br>
+  <em>"Through strict prompt engineering and citation anchoring. The prompt instructs Google Gemini to formulate its analysis exclusively using the retrieved document cards (<code>[DOC-1]</code>, <code>[DOC-2]</code>) and mandates that every figure must cite its source. In the React UI, citations are interactive badges that link directly to the raw, verifiable telemetry card."</em>
+</div>
+
+<div class="step-box avoid-break">
+  <strong>Q6: What happens if Google Gemini is down or the user has no API key?</strong><br>
+  <em>"I implemented an offline fallback: the <strong>Pulse Grounded Quant Engine</strong>. In <code>LlmResearchService.java</code>, if no key is present or if the Gemini API call throws an exception, the backend algorithmically synthesizes the exact same report in Java with simulated token streaming cadence. The user never experiences an error screen."</em>
+</div>
+
+<div class="step-box avoid-break">
+  <strong>Q7: How did you optimize Yahoo Finance API calls in your cron scheduler?</strong><br>
+  <em>"If 100 users set price alerts on NVDA, making 100 API calls every 2 minutes would trigger rate limits. I used Java Streams to group untriggered alerts by ticker symbol: <code>alerts.stream().collect(Collectors.groupingBy(PriceAlert::getSymbol))</code>. The scheduler makes <strong>exactly 1 API call per unique ticker</strong>, regardless of how many users are tracking it."</em>
+</div>
+
+<div class="step-box avoid-break">
+  <strong>Q8: How do you ensure users aren't spammed with alert emails every 2 minutes?</strong><br>
+  <em>"The <code>price_alerts</code> table includes a <code>triggered</code> boolean flag. When the scheduler detects that <code>lastPrice</code> has crossed <code>targetPrice</code>, it sets <code>triggered = true</code> and saves the record in PostgreSQL before sending the email. Future cron cycles filter for <code>findByTriggeredFalse()</code>, guaranteeing exactly one notification per price breach."</em>
+</div>
+
+<div class="step-box avoid-break">
+  <strong>Q9: How do you prevent SQL injection in your backend?</strong><br>
+  <em>"By using Spring Data JPA and Hibernate ORM. All repository queries use parameterized SQL prepared statements under the hood. User input is never concatenated directly into raw SQL strings."</em>
+</div>
+
+<div class="step-box avoid-break">
+  <strong>Q10: Why did you use Flyway instead of Hibernate's ddl-auto=update?</strong><br>
+  <em>"<code>hibernate.ddl-auto=update</code> is dangerous for production because it can silently alter columns, cause data loss, and does not version-control schema changes. Flyway enforces reproducible, versioned SQL migration scripts (<code>V1</code> through <code>V4</code>) that execute sequentially on application boot."</em>
+</div>
+
+<div class="step-box avoid-break">
+  <strong>Q11: How do you handle password storage securely?</strong><br>
+  <em>"I use <code>BCryptPasswordEncoder</code> with a work factor of 10. BCrypt incorporates a random 128-bit salt and an adaptive key derivation function that resists rainbow-table and brute-force GPU attacks."</em>
+</div>
+
+<div class="step-box avoid-break">
+  <strong>Q12: How is natural language entity resolution handled in the research assistant?</strong><br>
+  <em>"If a user asks 'Analyze Apple and Tesla', the regex extracts 'Apple' and 'Tesla'. The backend's <code>resolveToTicker()</code> method first checks if the word is an exact ticker. If not, it dynamically queries Yahoo Finance's search endpoint to resolve company names to tickers ('AAPL', 'TSLA') and caches the result in a thread-safe <code>ConcurrentHashMap</code>."</em>
+</div>
+
+<div class="step-box avoid-break">
+  <strong>Q13: How is CORS handled between Vite (port 5173) and Spring Boot (port 8080)?</strong><br>
+  <em>"Configured globally in <code>WebConfig.java</code> via <code>WebMvcConfigurer.addCorsMappings()</code>, allowing specified origin patterns, methods (GET, POST, PUT, DELETE, OPTIONS), and credentials. In production on Render/Vercel, origin headers are strictly matched."</em>
+</div>
+
+<div class="step-box avoid-break">
+  <strong>Q14: How is global error handling implemented?</strong><br>
+  <em>"Using a centralized <code>@RestControllerAdvice</code> class (<code>GlobalExceptionHandler.java</code>). It intercepts Spring validation exceptions (<code>MethodArgumentNotValidException</code>), authentication failures (<code>InvalidCredentialsException</code>), and business exceptions, translating them into consistent JSON error envelopes with timestamp, status code, and message."</em>
+</div>
+
+<div class="step-box avoid-break">
+  <strong>Q15: How is your Spring Boot backend optimized for cloud container deployment?</strong><br>
+  <em>"It is containerized with a multi-stage Dockerfile targeting Eclipse Temurin 17 JRE. I tuned JVM memory flags using <code>-Xmx256m</code> and <code>SerialGC</code>, enabled GZIP compression for JSON payloads (<code>server.compression.enabled=true</code>), and capped HikariCP connection pool size to 3 to run efficiently inside free-tier cloud containers on Render."</em>
+</div>
+
+</body>
+</html>

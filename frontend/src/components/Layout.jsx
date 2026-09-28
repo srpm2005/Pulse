@@ -36,6 +36,15 @@ export default function Layout({ children, userEmail, onLogout, currentView, set
                         </svg>
                         <span>Alerts</span>
                     </button>
+                    <button
+                        className={`nav-item ${currentView === 'research' ? 'active' : ''}`}
+                        onClick={() => setCurrentView('research')}
+                    >
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                        </svg>
+                        <span>Quant Research</span>
+                    </button>
                 </nav>
 
                 <div className="user-block">

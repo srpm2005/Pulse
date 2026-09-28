@@ -5,6 +5,7 @@ import StockWidget from './StockWidget';
 import AlertsTable from './AlertsTable';
 import SearchModal from './SearchModal';
 import AlertModal from './AlertModal';
+import ResearchAssistant from './ResearchAssistant';
 
 export default function DashboardContainer({ onLogout }) {
     const [currentView, setCurrentView] = useState('dashboard');
@@ -12,6 +13,8 @@ export default function DashboardContainer({ onLogout }) {
 
     const [isAlertOpen, setIsAlertOpen] = useState(false);
     const [alertDefaultSymbol, setAlertDefaultSymbol] = useState('');
+    const [isResearchOpen, setIsResearchOpen] = useState(false);
+    const [researchInitialSymbol, setResearchInitialSymbol] = useState(null);
     const [userEmail, setUserEmail] = useState(() => {
         const token = localStorage.getItem('pulse_jwt');
         if (token) {
@@ -76,6 +79,19 @@ export default function DashboardContainer({ onLogout }) {
             <Layout userEmail={userEmail} onLogout={onLogout} currentView={currentView} setCurrentView={setCurrentView}>
                 {currentView === 'dashboard' ? (
                     <section className="view-section" style={{ paddingTop: '72px' }}>
+                        <header className="view-header" style={{ marginBottom: '20px' }}>
+                            <h2>Watchlist</h2>
+                            <button
+                                className="btn-primary btn-sm"
+                                style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
+                                onClick={() => { setResearchInitialSymbol(null); setIsResearchOpen(true); }}
+                            >
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                                </svg>
+                                <span>Quant Research</span>
+                            </button>
+                        </header>
 
                         <div className="stock-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '20px' }}>
                             {trackedStocks.length === 0 && (
@@ -91,6 +107,10 @@ export default function DashboardContainer({ onLogout }) {
                                     companyName={stock.companyName}
                                     onRemove={removeStock}
                                     onSetAlert={handleOpenAlertFromCard}
+                                    onResearch={(sym) => {
+                                        setResearchInitialSymbol(sym);
+                                        setIsResearchOpen(true);
+                                    }}
                                 />
                             ))}
                         </div>
@@ -124,6 +144,16 @@ export default function DashboardContainer({ onLogout }) {
                 onAlertCreated={() => {
                     // Alert table polls internally
                 }}
+            />
+
+            <ResearchAssistant
+                isOpen={isResearchOpen || currentView === 'research'}
+                onClose={() => {
+                    setIsResearchOpen(false);
+                    if (currentView === 'research') setCurrentView('dashboard');
+                    setResearchInitialSymbol(null);
+                }}
+                initialSymbol={researchInitialSymbol}
             />
         </>
     );
